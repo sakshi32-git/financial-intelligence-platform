@@ -1,0 +1,82 @@
+"""
+commodity.py
+============
+Layout for the Commodities page.
+
+Displays a dropdown for commodity selection, KPI cards, and a price chart.
+"""
+
+from __future__ import annotations
+
+import dash_bootstrap_components as dbc
+from dash import dcc, html
+
+from src.dashboard.components.kpi_card import kpi_card
+
+def commodity_layout() -> html.Div:
+    """Return the layout for the Commodity Analysis page."""
+    return html.Div(
+        className="page-container",
+        children=[
+            # ── Header & Controls ──────────────────────────────────────────
+            dbc.Row(
+                className="mb-4 align-items-center",
+                children=[
+                    dbc.Col(
+                        html.H2("Commodity Analysis", className="page-title m-0"),
+                        width=12, md=6,
+                    ),
+                    dbc.Col(
+                        dcc.Dropdown(
+                            id="commodity-symbol-dropdown",
+                            options=[
+                                {"label": "Crude Oil (CL)", "value": "CL"},
+                                {"label": "Gold (GC)", "value": "GC"},
+                                {"label": "Natural Gas (NG)", "value": "NG"},
+                                {"label": "Wheat (ZW)", "value": "ZW"},
+                            ],
+                            value="GC",
+                            clearable=False,
+                            className="dash-bootstrap",
+                        ),
+                        width=12, md=6,
+                        className="text-end",
+                    ),
+                ],
+            ),
+
+            # ── KPI Cards ──────────────────────────────────────────────────
+            dbc.Row(
+                id="commodity-kpi-row",
+                className="mb-4 g-3",
+                children=[
+                    dbc.Col(kpi_card("Latest Close", "-", icon="bi-tag-fill"), width=12, sm=6, lg=3, id="commodity-kpi-close"),
+                    dbc.Col(kpi_card("Daily Return", "-", icon="bi-graph-up"), width=12, sm=6, lg=3, id="commodity-kpi-return"),
+                    dbc.Col(kpi_card("30d Volatility", "-", icon="bi-activity"), width=12, sm=6, lg=3, id="commodity-kpi-volatility"),
+                    dbc.Col(kpi_card("30d Trend (SMA)", "-", icon="bi-arrow-trend-up"), width=12, sm=6, lg=3, id="commodity-kpi-sma"),
+                ]
+            ),
+
+            # ── Charts ─────────────────────────────────────────────────────
+            dbc.Row(
+                children=[
+                    dbc.Col(
+                        dbc.Card(
+                            className="dashboard-card",
+                            children=[
+                                dbc.CardHeader("Historical Price & Forecast"),
+                                dbc.CardBody(
+                                    dcc.Graph(
+                                        id="commodity-price-chart",
+                                        config={"displayModeBar": False},
+                                        style={"height": "400px"}
+                                    )
+                                )
+                            ]
+                        ),
+                        width=12
+                    )
+                ]
+            )
+        ]
+    )

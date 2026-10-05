@@ -1,0 +1,112 @@
+/* ============================================================
+   kpi_card.css
+   Financial Intelligence Platform — KPI Card styles
+   ============================================================ */
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  --color-bg-card:          #12151d;
+  --color-border-card:      rgba(255, 255, 255, 0.05);
+  
+  --color-positive:         #10b981;
+  --color-positive-bg:      rgba(16, 185, 129, 0.1);
+  --color-negative:         #ef4444;
+  --color-negative-bg:      rgba(239, 68, 68, 0.1);
+  --color-neutral:          #9ca3af;
+  --color-neutral-bg:       rgba(156, 163, 175, 0.1);
+  
+  --shadow-card:            0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* ── KPI Card Shell ────────────────────────────────────────── */
+.kpi-card {
+  background:       var(--color-bg-card);
+  border:           1px solid var(--color-border-card);
+  border-radius:    16px;
+  padding:          20px;
+  display:          flex;
+  flex-direction:   column;
+  gap:              12px;
+  box-shadow:       var(--shadow-card);
+  transition:       transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.kpi-card:hover {
+  transform:        translateY(-2px);
+  box-shadow:       0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  border-color:     rgba(255, 255, 255, 0.1);
+}
+
+/* ── Header (Title & Icon) ─────────────────────────────────── */
+.kpi-header {
+  display:          flex;
+  justify-content:  space-between;
+  align-items:      flex-start;
+}
+
+.kpi-title {
+  font-size:        13px;
+  font-weight:      600;
+  color:            var(--color-text-muted);
+  text-transform:   uppercase;
+  letter-spacing:   0.5px;
+}
+
+.kpi-icon-wrap {
+  width:            32px;
+  height:           32px;
+  border-radius:    8px;
+  background:       rgba(255, 255, 255, 0.03);
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  color:            var(--color-text-dim);
+}
+
+.kpi-icon {
+  font-size:        16px;
+}
+
+/* ── Body (Value & Delta) ──────────────────────────────────── */
+.kpi-body {
+  display:          flex;
+  align-items:      baseline;
+  gap:              12px;
+}
+
+.kpi-value {
+  font-size:        28px;
+  font-weight:      700;
+  color:            var(--color-text-primary);
+  letter-spacing:   -0.5px;
+}
+
+/* ── Delta Badges ──────────────────────────────────────────── */
+.kpi-delta {
+  display:          flex;
+  align-items:      center;
+  padding:          2px 6px;
+  border-radius:    6px;
+  font-size:        12px;
+  font-weight:      600;
+  gap:              2px;
+}
+
+.kpi-delta-icon {
+  font-size:        14px;
+}
+
+.kpi-delta-positive {
+  color:            var(--color-positive);
+  background:       var(--color-positive-bg);
+}
+
+.kpi-delta-negative {
+  color:            var(--color-negative);
+  background:       var(--color-negative-bg);
+}
+
+.kpi-delta-neutral {
+  color:            var(--color-neutral);
+  background:       var(--color-neutral-bg);
+}

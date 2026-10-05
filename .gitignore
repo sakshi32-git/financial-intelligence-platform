@@ -1,0 +1,128 @@
+# ──────────────────────────────────────────────
+# Environment / Secrets — NEVER commit these
+# ──────────────────────────────────────────────
+.env
+*.env
+!.env.example
+
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+.installed.cfg
+lib/
+lib64/
+MANIFEST
+
+# ──────────────────────────────────────────────
+# Virtual Environments
+# ──────────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+.env.local
+.env.development
+.env.production
+
+# ──────────────────────────────────────────────
+# Secrets & Environment
+# ──────────────────────────────────────────────
+.env
+*.pem
+*.key
+*.crt
+secrets/
+
+# ──────────────────────────────────────────────
+# Testing & Coverage
+# ──────────────────────────────────────────────
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+htmlcov/
+.hypothesis/
+.pytest_cache/
+
+# ──────────────────────────────────────────────
+# Type Checking
+# ──────────────────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# ──────────────────────────────────────────────
+# Jupyter / IPython
+# ──────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ──────────────────────────────────────────────
+# Databases & Data Files
+# ──────────────────────────────────────────────
+*.db
+*.sqlite3
+*.sql.bak
+data/raw/
+data/processed/
+data/external/
+data/cache/
+
+# ──────────────────────────────────────────────
+# Logs
+# ──────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+# ──────────────────────────────────────────────
+# ML Artifacts
+# ──────────────────────────────────────────────
+models/
+mlruns/
+mlartifacts/
+*.pkl
+*.joblib
+*.h5
+*.onnx
+
+# ──────────────────────────────────────────────
+# Dashboard / Frontend Build
+# ──────────────────────────────────────────────
+assets/cache/
+.dash_cache/
+
+# ──────────────────────────────────────────────
+# Docker
+# ──────────────────────────────────────────────
+*.override.yml
+
+# ──────────────────────────────────────────────
+# IDE & OS
+# ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,262 @@
+/* ============================================================
+   sidebar.css
+   Financial Intelligence Platform — Sidebar styles
+   ============================================================ */
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  --sidebar-width:          260px;
+  --sidebar-collapsed-width: 72px;
+
+  /* Palette */
+  --color-bg-sidebar:       #0b0f19;
+  --color-bg-sidebar-hover: #1e293b;
+  --color-accent:           #38bdf8;
+  --color-accent-glow:      rgba(56, 189, 248, 0.22);
+  --color-text-primary:     #ffffff;
+  --color-text-muted:       #cbd5e1;
+  --color-text-dim:         #94a3b8;
+  --color-border:           rgba(255, 255, 255, 0.12);
+  --color-logo-bg:          linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+
+  /* Typography */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  /* Motion */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-medium: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Sidebar shell ─────────────────────────────────────────── */
+.sidebar {
+  position:         fixed;
+  top:              0;
+  left:             0;
+  height:           100vh;
+  width:            var(--sidebar-width);
+  background:       var(--color-bg-sidebar);
+  border-right:     1px solid var(--color-border);
+  display:          flex;
+  flex-direction:   column;
+  z-index:          1000;
+  overflow:         hidden;
+  font-family:      var(--font-sans);
+
+  /* Subtle glass effect */
+  backdrop-filter:  blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:       4px 0 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Logo / branding ───────────────────────────────────────── */
+.sidebar-logo-block {
+  display:        flex;
+  align-items:    center;
+  gap:            12px;
+  padding:        24px 20px 20px;
+  flex-shrink:    0;
+}
+
+.sidebar-logo-icon-wrap {
+  width:           42px;
+  height:          42px;
+  border-radius:   12px;
+  background:      var(--color-logo-bg);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+  box-shadow:      0 4px 16px rgba(79, 142, 247, 0.35);
+}
+
+.sidebar-logo-letters {
+  font-size:      14px;
+  font-weight:    800;
+  color:          #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-logo-text {
+  display:        flex;
+  flex-direction: column;
+  line-height:    1.2;
+  overflow:       hidden;
+}
+
+.sidebar-logo-line1 {
+  font-size:      11px;
+  font-weight:    500;
+  color:          var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.sidebar-logo-line2 {
+  font-size:      15px;
+  font-weight:    700;
+  color:          var(--color-text-primary);
+  white-space:    nowrap;
+}
+
+/* ── Divider & section label ───────────────────────────────── */
+.sidebar-hr {
+  border-color:   var(--color-border);
+  margin:         0 16px;
+  opacity:        1;
+}
+
+.sidebar-section-divider {
+  padding:        16px 20px 6px;
+  flex-shrink:    0;
+}
+
+.sidebar-section-label {
+  font-size:      10px;
+  font-weight:    700;
+  color:          #94a3b8;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ── Navigation ────────────────────────────────────────────── */
+.sidebar-nav {
+  padding:  4px 12px;
+  gap:      2px;
+  overflow-y: auto;
+  flex:     1 1 auto;
+}
+
+/* Hide scrollbar but keep scroll behaviour */
+.sidebar-nav::-webkit-scrollbar { width: 0; }
+.sidebar-nav { scrollbar-width: none; }
+
+.sidebar-nav-item {
+  display:        flex !important;
+  align-items:    center;
+  gap:            12px;
+  padding:        10px 14px !important;
+  border-radius:  10px !important;
+  color:          #cbd5e1 !important;
+  font-size:      14px;
+  font-weight:    600;
+  text-decoration: none !important;
+  transition:     background var(--transition-fast),
+                  color var(--transition-fast),
+                  box-shadow var(--transition-fast);
+  white-space:    nowrap;
+  overflow:       hidden;
+}
+
+.sidebar-nav-item:hover {
+  background:     #1e293b !important;
+  color:          #ffffff !important;
+}
+
+/* Active state — injected by dbc.NavLink(active="exact") */
+.sidebar-nav-item.active {
+  background:     linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
+  color:          #ffffff !important;
+  box-shadow:     0 4px 12px rgba(37, 99, 235, 0.4) !important;
+  font-weight:    700;
+}
+
+.sidebar-nav-icon {
+  font-size:      16px;
+  flex-shrink:    0;
+  width:          20px;
+  text-align:     center;
+  color:          #38bdf8;
+}
+
+.sidebar-nav-item.active .sidebar-nav-icon {
+  color:          #ffffff;
+}
+
+.sidebar-nav-label {
+  flex:           1;
+  overflow:       hidden;
+  text-overflow:  ellipsis;
+}
+
+/* ── Spacer ────────────────────────────────────────────────── */
+.sidebar-spacer {
+  flex:  1 1 auto;
+  min-height: 16px;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.sidebar-footer {
+  display:        flex;
+  flex-direction: column;
+  padding:        14px 20px 20px;
+  gap:            2px;
+  flex-shrink:    0;
+}
+
+.sidebar-footer-version {
+  font-size:      11px;
+  font-weight:    600;
+  color:          var(--color-accent);
+  letter-spacing: 0.5px;
+}
+
+.sidebar-footer-name {
+  font-size:      11px;
+  color:          var(--color-text-dim);
+  white-space:    nowrap;
+  overflow:       hidden;
+  text-overflow:  ellipsis;
+}
+
+/* ── Page content offset ───────────────────────────────────── */
+/* Any page layout that sits beside the sidebar should apply this class */
+.page-content {
+  margin-left:    var(--sidebar-width);
+  min-height:     100vh;
+  background:     #0a0c10;
+  color:          var(--color-text-primary);
+  font-family:    var(--font-sans);
+  padding:        32px;
+  transition:     margin-left var(--transition-medium);
+}
+
+/* ── Responsive: collapse sidebar on narrow screens ────────── */
+@media (max-width: 768px) {
+  .sidebar {
+    width:     var(--sidebar-collapsed-width);
+  }
+
+  .sidebar-logo-text,
+  .sidebar-nav-label,
+  .sidebar-section-divider,
+  .sidebar-footer-name {
+    display: none;
+  }
+
+  .sidebar-logo-block {
+    justify-content: center;
+    padding: 20px 0;
+  }
+
+  .sidebar-nav-item {
+    justify-content: center;
+    padding: 12px !important;
+  }
+
+  .sidebar-nav-icon {
+    width:     auto;
+    font-size: 18px;
+  }
+
+  .sidebar-footer {
+    align-items: center;
+  }
+
+  .sidebar-footer-version {
+    font-size: 9px;
+  }
+
+  .page-content {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+}

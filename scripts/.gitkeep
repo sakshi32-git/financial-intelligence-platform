@@ -1,0 +1,2 @@
+# Operational scripts — DB seeding, deployment helpers, data exports.
+# These are standalone Python scripts, not part of the src package.

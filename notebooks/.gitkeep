@@ -1,0 +1,2 @@
+# Exploratory analysis notebooks — for research and prototyping only.
+# Production logic must live in src/, not in notebooks.

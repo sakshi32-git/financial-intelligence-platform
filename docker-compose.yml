@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    container_name: fip_dashboard
+    ports:
+      - "8050:8050"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - DASHBOARD_HOST=0.0.0.0
+      - DASHBOARD_PORT=8050
+    restart: unless-stopped

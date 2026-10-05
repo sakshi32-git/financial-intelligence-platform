@@ -1,0 +1,50 @@
+# Byte-compiled / optimised
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files (never commit secrets)
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# Database / migrations state
+*.db
+*.sqlite3
+
+# ML model artifacts
+models/
+mlruns/
+
+# Test cache and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# CI artefacts
+.github/
+
+# Node (if any front-end tooling is ever added)
+node_modules/

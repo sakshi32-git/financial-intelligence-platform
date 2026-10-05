@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: financial-intelligence-platform
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "gunicorn src.dashboard.app:server --config gunicorn.conf.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true

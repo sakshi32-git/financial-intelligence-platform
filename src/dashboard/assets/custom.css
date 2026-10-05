@@ -1,0 +1,167 @@
+/* ============================================================
+   custom.css
+   Financial Intelligence Platform — High-Contrast Dashboard Styles
+   ============================================================ */
+
+/* ── Global Typography & Layout Overrides ───────────────────── */
+body {
+  background-color: #0b0f17 !important;
+  color: #f8fafc !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+.page-title {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+}
+
+.text-muted {
+  color: #cbd5e1 !important;
+  font-size: 0.95rem !important;
+}
+
+/* ── Dashboard Chart Cards (Light theme inside dark dashboard) ─ */
+.dashboard-card {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+}
+
+.dashboard-card .card-header {
+  background-color: #f1f5f9 !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  padding: 14px 20px !important;
+  letter-spacing: -0.2px !important;
+}
+
+.dashboard-card .card-body {
+  background-color: #ffffff !important;
+  padding: 20px !important;
+}
+
+/* ── Dropdown High-Contrast Styling (Apple, Tickers, Indicators) ── */
+
+/* Control Box Container */
+.dash-bootstrap .Select-control,
+.Select-control,
+div[class*="-control"],
+div[class*="-Control"] {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+  border: 1.5px solid #475569 !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  min-height: 42px !important;
+}
+
+/* Hover state on control box */
+.dash-bootstrap .Select-control:hover,
+.Select-control:hover,
+div[class*="-control"]:hover {
+  border-color: #38bdf8 !important;
+}
+
+/* Selected Value Text & Placeholder */
+.dash-bootstrap .Select-value-label,
+.dash-bootstrap .Select-value,
+.dash-bootstrap .Select-placeholder,
+.Select-value-label,
+.Select-value,
+.Select-placeholder,
+div[class*="-singleValue"],
+div[class*="-SingleValue"],
+div[class*="-placeholder"],
+div[class*="-Placeholder"],
+div[class*="-valueContainer"] *,
+div[class*="-ValueContainer"] * {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  opacity: 1 !important;
+}
+
+/* Input text inside select bar */
+.dash-bootstrap input,
+.Select input,
+div[class*="-input"] input,
+div[class*="-Input"] input {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* Dropdown arrow and clear icons */
+.dash-bootstrap .Select-arrow,
+.dash-bootstrap .Select-arrow-zone,
+div[class*="-indicatorContainer"] svg,
+div[class*="-IndicatorsContainer"] svg {
+  fill: #38bdf8 !important;
+  color: #38bdf8 !important;
+  opacity: 1 !important;
+}
+
+/* Dropdown Menu Container (Opened list) */
+.dash-bootstrap .Select-menu-outer,
+.Select-menu-outer,
+.Select-menu,
+div[class*="-menu"],
+div[class*="-Menu"] {
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+  border: 1.5px solid #475569 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  z-index: 99999 !important;
+  overflow: hidden !important;
+}
+
+/* Dropdown Options (Items in list) */
+.dash-bootstrap .Select-option,
+.Select-option,
+div[class*="-option"],
+div[class*="-Option"] {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+  padding: 10px 16px !important;
+  cursor: pointer !important;
+}
+
+/* Focused / Hovered / Selected Option in list */
+.dash-bootstrap .Select-option:hover,
+.dash-bootstrap .Select-option.is-focused,
+.dash-bootstrap .Select-option.is-selected,
+.Select-option:hover,
+.Select-option.is-focused,
+.Select-option.is-selected,
+div[class*="-option"]:hover,
+div[class*="-option"][class*="-is-focused"],
+div[class*="-option"][class*="-is-selected"] {
+  background-color: #334155 !important;
+  color: #38bdf8 !important;
+}
+
+/* Multi-select badges (Correlation page) */
+div[class*="-multiValue"],
+div[class*="-MultiValue"] {
+  background-color: #334155 !important;
+  border: 1px solid #475569 !important;
+  border-radius: 6px !important;
+}
+
+div[class*="-multiValue"] *,
+div[class*="-MultiValue"] * {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+div[class*="-multiValue"] div[class*="-remove"]:hover {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+}
