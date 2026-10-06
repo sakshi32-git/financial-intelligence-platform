@@ -114,7 +114,12 @@ class DatabaseSettings(BaseSettings):
 class APISettings(BaseSettings):
     """External financial data provider API keys."""
 
-    model_config = SettingsConfigDict(env_prefix="")
+    model_config = SettingsConfigDict(
+        env_file=PROJECT_ROOT / ".env",
+        env_file_encoding="utf-8",
+        populate_by_name=True,
+        extra="ignore",
+    )
 
     alpha_vantage_api_key: SecretStr = Field(
         default="your-alpha-vantage-key", alias="ALPHA_VANTAGE_API_KEY"
@@ -128,8 +133,6 @@ class APISettings(BaseSettings):
     fred_api_key: SecretStr = Field(
         default="your-fred-key", alias="FRED_API_KEY"
     )
-
-    model_config = SettingsConfigDict(populate_by_name=True)
 
 
 class ETLSettings(BaseSettings):
@@ -155,7 +158,12 @@ class LoggingSettings(BaseSettings):
 class MLSettings(BaseSettings):
     """Machine learning experiment tracking and model registry."""
 
-    model_config = SettingsConfigDict(env_prefix="")
+    model_config = SettingsConfigDict(
+        env_file=PROJECT_ROOT / ".env",
+        env_file_encoding="utf-8",
+        populate_by_name=True,
+        extra="ignore",
+    )
 
     mlflow_tracking_uri: str = Field(
         default="http://localhost:5000", alias="MLFLOW_TRACKING_URI"
@@ -163,8 +171,6 @@ class MLSettings(BaseSettings):
     model_registry_path: Path = Field(
         default=PROJECT_ROOT / "models", alias="MODEL_REGISTRY_PATH"
     )
-
-    model_config = SettingsConfigDict(populate_by_name=True)
 
 
 class DashboardSettings(BaseSettings):

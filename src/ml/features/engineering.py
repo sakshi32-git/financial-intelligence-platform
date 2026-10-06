@@ -168,6 +168,7 @@ def build_features(
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(
     df: pd.DataFrame,
     price_col: str,
@@ -187,6 +188,4 @@ def _validate_inputs(
         )
     for lag in lags:
         if not isinstance(lag, int) or lag < 1:
-            raise ValueError(
-                f"All lags must be positive integers, got {lag!r}."
-            )
+            raise ValueError(f"All lags must be positive integers, got {lag!r}.")

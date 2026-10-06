@@ -65,9 +65,19 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 Interval = Literal[
-    "1m", "2m", "5m", "15m", "30m",
-    "60m", "90m", "1h",
-    "1d", "5d", "1wk", "1mo", "3mo",
+    "1m",
+    "2m",
+    "5m",
+    "15m",
+    "30m",
+    "60m",
+    "90m",
+    "1h",
+    "1d",
+    "5d",
+    "1wk",
+    "1mo",
+    "3mo",
 ]
 
 _VALID_INTERVALS: frozenset[str] = frozenset(Interval.__args__)  # type: ignore[attr-defined]
@@ -87,7 +97,7 @@ _RETRY_POLICY = dict(
     wait=wait_exponential(multiplier=1, min=2, max=30),
     stop=stop_after_attempt(4),
     before_sleep=before_sleep_log(log, logging.WARNING),
-    reraise=False,           # We map to domain exceptions in the wrapper.
+    reraise=False,  # We map to domain exceptions in the wrapper.
 )
 
 
@@ -305,9 +315,7 @@ class YahooFinanceClient:
         )
         return self._fetch_financials(ticker, label)
 
-    def get_balance_sheet(
-        self, ticker: str, quarterly: bool = False
-    ) -> pd.DataFrame:
+    def get_balance_sheet(self, ticker: str, quarterly: bool = False) -> pd.DataFrame:
         """
         Return the balance sheet for a ticker.
 
@@ -336,9 +344,7 @@ class YahooFinanceClient:
         )
         return self._fetch_financials(ticker, label)
 
-    def get_cash_flow(
-        self, ticker: str, quarterly: bool = False
-    ) -> pd.DataFrame:
+    def get_cash_flow(self, ticker: str, quarterly: bool = False) -> pd.DataFrame:
         """
         Return the cash-flow statement for a ticker.
 
@@ -507,7 +513,9 @@ class YahooFinanceClient:
         """
         yf_ticker = self._get_yf_ticker(ticker)
         try:
-            df = getattr(yf_ticker, attribute)  # these are properties in yfinance >=0.2.x
+            df = getattr(
+                yf_ticker, attribute
+            )  # these are properties in yfinance >=0.2.x
         except Exception as exc:
             raise YahooFinanceError(
                 f"Unexpected error while fetching '{attribute}': {exc}",

@@ -314,7 +314,9 @@ class Company(Base):
     )
 
     def __repr__(self) -> str:  # pragma: no cover
-        return f"<Company id={self.id} ticker={self.ticker!r} exchange={self.exchange!r}>"
+        return (
+            f"<Company id={self.id} ticker={self.ticker!r} exchange={self.exchange!r}>"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -331,9 +333,7 @@ class StockPrice(Base):
     __tablename__ = "stock_prices"
 
     __table_args__ = (
-        UniqueConstraint(
-            "company_id", "price_date", name="uq_stockprice_company_date"
-        ),
+        UniqueConstraint("company_id", "price_date", name="uq_stockprice_company_date"),
         Index("ix_stockprice_price_date", "price_date"),
         Index("ix_stockprice_company_date", "company_id", "price_date"),
         CheckConstraint("open_price  > 0", name="ck_stockprice_open_pos"),
@@ -482,9 +482,7 @@ class Commodity(Base):
     __tablename__ = "commodities"
 
     __table_args__ = (
-        UniqueConstraint(
-            "symbol", "price_date", name="uq_commodity_symbol_date"
-        ),
+        UniqueConstraint("symbol", "price_date", name="uq_commodity_symbol_date"),
         Index("ix_commodity_symbol", "symbol"),
         Index("ix_commodity_price_date", "price_date"),
         Index("ix_commodity_symbol_date", "symbol", "price_date"),

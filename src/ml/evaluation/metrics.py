@@ -80,28 +80,32 @@ def compute_regression_metrics(
     # MAPE: skip zero actuals to avoid division-by-zero.
     nonzero_mask = y_true != 0
     mape = (
-        float(mean_absolute_percentage_error(y_true[nonzero_mask], y_pred[nonzero_mask]))
+        float(
+            mean_absolute_percentage_error(y_true[nonzero_mask], y_pred[nonzero_mask])
+        )
         if nonzero_mask.any()
         else float("nan")
     )
 
-    r2   = float(r2_score(y_true, y_pred))
-    mae  = float(mean_absolute_error(y_true, y_pred))
-    mse  = float(mean_squared_error(y_true, y_pred))
+    r2 = float(r2_score(y_true, y_pred))
+    mae = float(mean_absolute_error(y_true, y_pred))
+    mse = float(mean_squared_error(y_true, y_pred))
     rmse = float(np.sqrt(mse))
     corr = float(np.corrcoef(y_true, y_pred)[0, 1]) if len(y_true) > 1 else float("nan")
 
     result = pd.DataFrame(
-        [{
-            "label":     label,
-            "r2":        round(r2, 6),
-            "mae":       round(mae, 6),
-            "rmse":      round(rmse, 6),
-            "mse":       round(mse, 6),
-            "mape":      round(mape, 6) if not np.isnan(mape) else np.nan,
-            "corr":      round(corr, 6),
-            "n_samples": len(y_true),
-        }]
+        [
+            {
+                "label": label,
+                "r2": round(r2, 6),
+                "mae": round(mae, 6),
+                "rmse": round(rmse, 6),
+                "mse": round(mse, 6),
+                "mape": round(mape, 6) if not np.isnan(mape) else np.nan,
+                "corr": round(corr, 6),
+                "n_samples": len(y_true),
+            }
+        ]
     )
 
     log.info(
@@ -146,21 +150,27 @@ def compute_directional_accuracy(
         raise ValueError("y_true and y_pred must be non-empty and same length.")
 
     correct = np.sign(y_true) == np.sign(y_pred)
-    up_mask   = y_true > 0
+    up_mask = y_true > 0
     down_mask = y_true < 0
 
     directional_accuracy = float(correct.mean())
-    correct_up   = float(correct[up_mask].mean())   if up_mask.any()   else float("nan")
-    correct_down = float(correct[down_mask].mean())  if down_mask.any() else float("nan")
+    correct_up = float(correct[up_mask].mean()) if up_mask.any() else float("nan")
+    correct_down = float(correct[down_mask].mean()) if down_mask.any() else float("nan")
 
     result = pd.DataFrame(
-        [{
-            "label":                 label,
-            "directional_accuracy":  round(directional_accuracy, 6),
-            "correct_up":            round(correct_up, 6)   if not np.isnan(correct_up)   else np.nan,
-            "correct_down":          round(correct_down, 6) if not np.isnan(correct_down) else np.nan,
-            "total":                 len(y_true),
-        }]
+        [
+            {
+                "label": label,
+                "directional_accuracy": round(directional_accuracy, 6),
+                "correct_up": (
+                    round(correct_up, 6) if not np.isnan(correct_up) else np.nan
+                ),
+                "correct_down": (
+                    round(correct_down, 6) if not np.isnan(correct_down) else np.nan
+                ),
+                "total": len(y_true),
+            }
+        ]
     )
 
     log.info(

@@ -21,13 +21,12 @@ from datetime import date, datetime
 import pandas as pd
 from sqlalchemy import text
 
-from src.database.database import SessionLocal
+from src.database.database import Company, Commodity, SessionLocal, StockPrice
 
 log = logging.getLogger(__name__)
 
 # SQL that fetches the price series for one or more tickers.
-_PRICE_QUERY = text(
-    """
+_PRICE_QUERY = text("""
     SELECT
         c.ticker,
         sp.price_date,
@@ -43,8 +42,7 @@ _PRICE_QUERY = text(
       AND (:start IS NULL OR sp.price_date >= :start::date)
       AND (:end   IS NULL OR sp.price_date <= :end::date)
     ORDER BY c.ticker, sp.price_date ASC
-    """
-)
+    """)
 
 
 class AnalyticsLoader:
@@ -201,24 +199,54 @@ class AnalyticsLoader:
         start: str | None,
         end: str | None,
     ) -> pd.DataFrame:
-        rows = self._session.execute(
-            _PRICE_QUERY,
-            {"tickers": tickers, "start": start, "end": end},
-        ).fetchall()
+        query = (
+            self._session.query(
+                Company.ticker,
+                StockPrice.price_date,
+                StockPrice.open_price,
+                StockPrice.high_price,
+                StockPrice.low_price,
+                StockPrice.close_price,
+                StockPrice.volume,
+                StockPrice.adj_close,
+            )
+            .join(Company, Company.id == StockPrice.company_id)
+            .filter(Company.ticker.in_(tickers))
+        )
+
+        if start:
+            query = query.filter(StockPrice.price_date >= start)
+        if end:
+            query = query.filter(StockPrice.price_date <= end)
+
+        rows = query.order_by(Company.ticker, StockPrice.price_date.asc()).all()
 
         if not rows:
             return pd.DataFrame()
 
-        df = pd.DataFrame(rows, columns=[
-            "ticker", "price_date", "open_price",
-            "high_price", "low_price", "close_price",
-            "volume", "adj_close",
-        ])
+        df = pd.DataFrame(
+            rows,
+            columns=[
+                "ticker",
+                "price_date",
+                "open_price",
+                "high_price",
+                "low_price",
+                "close_price",
+                "volume",
+                "adj_close",
+            ],
+        )
 
         df["price_date"] = pd.to_datetime(df["price_date"])
 
-        for col in ("open_price", "high_price", "low_price",
-                    "close_price", "adj_close"):
+        for col in (
+            "open_price",
+            "high_price",
+            "low_price",
+            "close_price",
+            "adj_close",
+        ):
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
         df["volume"] = pd.to_numeric(df["volume"], errors="coerce").astype("Int64")
@@ -253,42 +281,43 @@ class AnalyticsLoader:
             "Loading commodity prices from DB",
             extra={"symbol": symbol, "start": str(start), "end": str(end)},
         )
-        
-        query = text(
-            """
-            SELECT
-                symbol as ticker,
-                price_date,
-                open_price,
-                high_price,
-                low_price,
-                close_price,
-                volume
-            FROM commodities
-            WHERE symbol = :symbol
-              AND (:start IS NULL OR price_date >= :start::date)
-              AND (:end   IS NULL OR price_date <= :end::date)
-            ORDER BY price_date ASC
-            """
-        )
-        
-        rows = self._session.execute(
-            query,
-            {"symbol": symbol.upper(), "start": str(start) if start else None, "end": str(end) if end else None},
-        ).fetchall()
+
+        query = self._session.query(
+            Commodity.symbol.label("ticker"),
+            Commodity.price_date,
+            Commodity.open_price,
+            Commodity.high_price,
+            Commodity.low_price,
+            Commodity.close_price,
+            Commodity.volume,
+        ).filter(Commodity.symbol == symbol.upper())
+
+        if start:
+            query = query.filter(Commodity.price_date >= str(start))
+        if end:
+            query = query.filter(Commodity.price_date <= str(end))
+
+        rows = query.order_by(Commodity.price_date.asc()).all()
 
         if not rows:
             return pd.DataFrame()
 
-        df = pd.DataFrame(rows, columns=[
-            "ticker", "price_date", "open_price",
-            "high_price", "low_price", "close_price",
-            "volume"
-        ])
+        df = pd.DataFrame(
+            rows,
+            columns=[
+                "ticker",
+                "price_date",
+                "open_price",
+                "high_price",
+                "low_price",
+                "close_price",
+                "volume",
+            ],
+        )
 
         df["price_date"] = pd.to_datetime(df["price_date"])
         for col in ("open_price", "high_price", "low_price", "close_price"):
             df[col] = pd.to_numeric(df[col], errors="coerce")
-            
+
         df["volume"] = pd.to_numeric(df["volume"], errors="coerce").astype("Int64")
         return df

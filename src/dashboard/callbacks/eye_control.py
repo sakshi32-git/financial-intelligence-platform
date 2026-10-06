@@ -87,7 +87,9 @@ def register_eye_control_callbacks(app: Dash) -> None:
         ],
         prevent_initial_call=True,
     )
-    def update_calibration_settings(smoothing: float, blink_thresh: float, cooldown: float):
+    def update_calibration_settings(
+        smoothing: float, blink_thresh: float, cooldown: float
+    ):
         """Update live calibration parameters on the EyeTrackerController."""
         if smoothing:
             eye_tracker.smoothing_alpha = float(smoothing)

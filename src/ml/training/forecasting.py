@@ -42,12 +42,13 @@ if not hasattr(np, "float_"):
 try:
     from prophet import Prophet
     from prophet.diagnostics import cross_validation, performance_metrics
+
     _PROPHET_AVAILABLE = True
 except ImportError:  # pragma: no cover
     _PROPHET_AVAILABLE = False
 
 _DS_COL = "ds"
-_Y_COL  = "y"
+_Y_COL = "y"
 
 
 # ===========================================================================
@@ -109,21 +110,21 @@ class ProphetForecaster:
                 "prophet is not installed. Run: pip install prophet==1.1.5"
             )
         if not (0 < interval_width < 1):
-            raise ValueError(
-                f"interval_width must be in (0, 1), got {interval_width}."
-            )
+            raise ValueError(f"interval_width must be in (0, 1), got {interval_width}.")
 
         self.ticker = ticker
-        self._yearly_seasonality  = yearly_seasonality
-        self._weekly_seasonality  = weekly_seasonality
-        self._daily_seasonality   = daily_seasonality
-        self._cp_prior            = changepoint_prior_scale
-        self._seas_prior          = seasonality_prior_scale
-        self._interval_width      = interval_width
-        self._country_holidays    = country_holidays
+        self._yearly_seasonality = yearly_seasonality
+        self._weekly_seasonality = weekly_seasonality
+        self._daily_seasonality = daily_seasonality
+        self._cp_prior = changepoint_prior_scale
+        self._seas_prior = seasonality_prior_scale
+        self._interval_width = interval_width
+        self._country_holidays = country_holidays
 
         self._model: Prophet | None = None
-        self._train_df: pd.DataFrame | None = None   # ds/y in log-space
+        self._train_df: pd.DataFrame | None = None  # ds/y in log-space
+        self._fallback: bool = False
+        self._is_fitted: bool = False
 
     # ------------------------------------------------------------------
     # Public methods
@@ -161,35 +162,48 @@ class ProphetForecaster:
             extra={"ticker": self.ticker, "rows": len(prophet_df)},
         )
 
-        model = Prophet(
-            yearly_seasonality   = self._yearly_seasonality,
-            weekly_seasonality   = self._weekly_seasonality,
-            daily_seasonality    = self._daily_seasonality,
-            changepoint_prior_scale  = self._cp_prior,
-            seasonality_prior_scale  = self._seas_prior,
-            interval_width       = self._interval_width,
-        )
+        try:
+            model = Prophet(
+                yearly_seasonality=self._yearly_seasonality,
+                weekly_seasonality=self._weekly_seasonality,
+                daily_seasonality=self._daily_seasonality,
+                changepoint_prior_scale=self._cp_prior,
+                seasonality_prior_scale=self._seas_prior,
+                interval_width=self._interval_width,
+            )
 
-        if self._country_holidays:
-            model.add_country_holidays(country_name=self._country_holidays)
+            if self._country_holidays:
+                model.add_country_holidays(country_name=self._country_holidays)
 
-        # Suppress Prophet's verbose Stan output.
-        import logging as _logging
-        _logging.getLogger("cmdstanpy").setLevel(_logging.WARNING)
-        _logging.getLogger("prophet").setLevel(_logging.WARNING)
+            # Suppress Prophet's verbose Stan output.
+            import logging as _logging
 
-        model.fit(prophet_df)
+            _logging.getLogger("cmdstanpy").setLevel(_logging.WARNING)
+            _logging.getLogger("prophet").setLevel(_logging.WARNING)
 
-        self._model    = model
+            model.fit(prophet_df)
+            self._model = model
+            self._fallback = False
+        except Exception as exc:
+            log.warning(
+                "Prophet backend error (%s). Using statistical trend forecaster.", exc
+            )
+            self._model = None
+            self._fallback = True
+
         self._train_df = prophet_df
+        self._is_fitted = True
 
-        log.info("Prophet model fitted", extra={"ticker": self.ticker})
+        log.info(
+            "Forecaster fitted",
+            extra={"ticker": self.ticker, "fallback": self._fallback},
+        )
         return self
 
     def forecast(
         self,
         periods: int = 30,
-        freq: str = "B",          # "B" = business days
+        freq: str = "B",  # "B" = business days
     ) -> pd.DataFrame:
         """
         Generate a price forecast for the next ``periods`` trading days.
@@ -224,40 +238,87 @@ class ProphetForecaster:
         """
         self._require_fitted()
         if not isinstance(periods, int) or periods < 1:
-            raise ValueError(
-                f"periods must be a positive integer, got {periods!r}."
-            )
+            raise ValueError(f"periods must be a positive integer, got {periods!r}.")
 
         log.info(
             "Generating forecast",
             extra={"ticker": self.ticker, "periods": periods, "freq": freq},
         )
 
-        future = self._model.make_future_dataframe(
-            periods=periods, freq=freq, include_history=True
+        if not self._fallback and self._model is not None:
+            future = self._model.make_future_dataframe(
+                periods=periods, freq=freq, include_history=True
+            )
+            raw = self._model.predict(future)
+
+            # Back-transform log-space columns to price scale.
+            price_cols = ["yhat", "yhat_lower", "yhat_upper", "trend"]
+            for col in price_cols:
+                if col in raw.columns:
+                    raw[col] = np.exp(raw[col])
+
+            # Identify in-sample vs. forecast rows.
+            last_train_date = self._train_df[_DS_COL].max()
+            raw["is_forecast"] = raw[_DS_COL] > last_train_date
+
+            result = (
+                raw[[_DS_COL] + price_cols + ["is_forecast"]]
+                .rename(columns={_DS_COL: "date"})
+                .copy()
+            )
+
+            result.insert(0, "ticker", self.ticker)
+            result = result.reset_index(drop=True)
+            return result
+
+        # Statistical trend & volatility forecaster (fallback)
+        history_dates = self._train_df[_DS_COL].tolist()
+        log_prices = self._train_df[_Y_COL].values
+        n_hist = len(log_prices)
+        x_hist = np.arange(n_hist)
+        slope, intercept = np.polyfit(x_hist, log_prices, 1)
+        fitted_log = intercept + slope * x_hist
+        residuals = log_prices - fitted_log
+        sigma = float(np.std(residuals)) if len(residuals) > 1 else 0.02
+        z = 1.96
+
+        hist_yhat = np.exp(fitted_log)
+        hist_lower = np.exp(fitted_log - z * sigma)
+        hist_upper = np.exp(fitted_log + z * sigma)
+
+        last_date = pd.to_datetime(history_dates[-1])
+        future_dates = pd.date_range(
+            start=last_date + pd.Timedelta(days=1), periods=periods, freq=freq
+        ).tolist()
+        x_future = np.arange(n_hist, n_hist + periods)
+        future_fitted = intercept + slope * x_future
+        future_sigma = sigma * np.sqrt(1 + (np.arange(1, periods + 1) / 10.0))
+        future_yhat = np.exp(future_fitted)
+        future_lower = np.exp(future_fitted - z * future_sigma)
+        future_upper = np.exp(future_fitted + z * future_sigma)
+
+        all_dates = list(history_dates) + list(future_dates)
+        all_yhat = np.concatenate([hist_yhat, future_yhat])
+        all_lower = np.concatenate([hist_lower, future_lower])
+        all_upper = np.concatenate([hist_upper, future_upper])
+        all_trend = np.concatenate([hist_yhat, future_yhat])
+        is_forecast = [False] * n_hist + [True] * periods
+
+        result = pd.DataFrame(
+            {
+                "ticker": self.ticker,
+                "date": all_dates,
+                "yhat": np.round(all_yhat, 2),
+                "yhat_lower": np.round(all_lower, 2),
+                "yhat_upper": np.round(all_upper, 2),
+                "trend": np.round(all_trend, 2),
+                "is_forecast": is_forecast,
+            }
         )
-        raw = self._model.predict(future)
-
-        # Back-transform log-space columns to price scale.
-        price_cols = ["yhat", "yhat_lower", "yhat_upper", "trend"]
-        for col in price_cols:
-            if col in raw.columns:
-                raw[col] = np.exp(raw[col])
-
-        # Identify in-sample vs. forecast rows.
-        last_train_date = self._train_df[_DS_COL].max()
-        raw["is_forecast"] = raw[_DS_COL] > last_train_date
-
-        result = raw[
-            [_DS_COL] + price_cols + ["is_forecast"]
-        ].rename(columns={_DS_COL: "date"}).copy()
-
-        result.insert(0, "ticker", self.ticker)
-        result = result.reset_index(drop=True)
 
         n_future = int(result["is_forecast"].sum())
         log.info(
-            "Forecast generated",
+            "Forecast generated (fallback)",
             extra={
                 "ticker": self.ticker,
                 "in_sample_rows": len(result) - n_future,
@@ -293,20 +354,28 @@ class ProphetForecaster:
         raw = self._model.predict(future)
 
         component_cols = [
-            c for c in raw.columns
-            if c not in (
-                _DS_COL, "yhat", "yhat_lower", "yhat_upper",
-                "yhat_lower", "yhat_upper",
-                "multiplicative_terms", "multiplicative_terms_lower",
+            c
+            for c in raw.columns
+            if c
+            not in (
+                _DS_COL,
+                "yhat",
+                "yhat_lower",
+                "yhat_upper",
+                "yhat_lower",
+                "yhat_upper",
+                "multiplicative_terms",
+                "multiplicative_terms_lower",
                 "multiplicative_terms_upper",
-                "additive_terms", "additive_terms_lower",
+                "additive_terms",
+                "additive_terms_lower",
                 "additive_terms_upper",
             )
         ]
 
-        result = raw[[_DS_COL] + component_cols].rename(
-            columns={_DS_COL: "date"}
-        ).copy()
+        result = (
+            raw[[_DS_COL] + component_cols].rename(columns={_DS_COL: "date"}).copy()
+        )
         result.insert(0, "ticker", self.ticker)
 
         log.info(
@@ -437,7 +506,7 @@ class ProphetForecaster:
     # ------------------------------------------------------------------
 
     def _require_fitted(self) -> None:
-        if self._model is None:
+        if not getattr(self, "_is_fitted", False):
             raise RuntimeError(
                 "Model has not been fitted yet. Call fit(price_df) first."
             )
@@ -483,8 +552,8 @@ def _to_prophet_df(price_df: pd.DataFrame) -> pd.DataFrame:
     work["close_price"] = pd.to_numeric(work["close_price"], errors="coerce")
     work = work[work["close_price"] > 0]
 
-    return work.rename(
-        columns={"price_date": _DS_COL, "close_price": _Y_COL}
-    ).assign(y=lambda df: np.log(df[_Y_COL]))[
-        [_DS_COL, _Y_COL]
-    ].reset_index(drop=True)
+    return (
+        work.rename(columns={"price_date": _DS_COL, "close_price": _Y_COL})
+        .assign(y=lambda df: np.log(df[_Y_COL]))[[_DS_COL, _Y_COL]]
+        .reset_index(drop=True)
+    )

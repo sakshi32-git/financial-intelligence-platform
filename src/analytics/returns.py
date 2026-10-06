@@ -87,8 +87,11 @@ def compute_daily_returns(
         "Daily returns computed",
         extra={
             "non_null": int(result["daily_return"].notna().sum()),
-            "mean": round(float(result["daily_return"].mean()), 6)
-            if result["daily_return"].notna().any() else None,
+            "mean": (
+                round(float(result["daily_return"].mean()), 6)
+                if result["daily_return"].notna().any()
+                else None
+            ),
         },
     )
     return result
@@ -153,9 +156,7 @@ def compute_monthly_returns(
         agg[ticker_col] = "last"
 
     monthly = work.resample("ME").agg(agg).reset_index()
-    monthly = monthly.rename(
-        columns={date_col: "period", price_col: "month_end_price"}
-    )
+    monthly = monthly.rename(columns={date_col: "period", price_col: "month_end_price"})
     monthly["period"] = monthly["period"].dt.to_period("M")
 
     prices = monthly["month_end_price"]
@@ -188,14 +189,13 @@ def _validate_price_col(df: pd.DataFrame, price_col: str) -> None:
 
 def _validate_method(method: str) -> None:
     if method not in ("simple", "log"):
-        raise ValueError(
-            f"method={method!r} is not valid. Choose 'simple' or 'log'."
-        )
+        raise ValueError(f"method={method!r} is not valid. Choose 'simple' or 'log'.")
 
 
 def _safe_log(ratio: float) -> float:
     """Natural log of ratio; returns NaN for non-positive or NaN input."""
     import math
+
     if ratio is None or (isinstance(ratio, float) and math.isnan(ratio)):
         return float("nan")
     if ratio <= 0:

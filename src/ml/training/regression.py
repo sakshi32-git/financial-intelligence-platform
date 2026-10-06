@@ -45,9 +45,9 @@ log = logging.getLogger(__name__)
 ModelName = Literal["linear", "ridge", "lasso", "elasticnet"]
 
 _MODEL_REGISTRY: dict[str, object] = {
-    "linear":     LinearRegression(),
-    "ridge":      Ridge(alpha=1.0),
-    "lasso":      Lasso(alpha=0.001, max_iter=10_000),
+    "linear": LinearRegression(),
+    "ridge": Ridge(alpha=1.0),
+    "lasso": Lasso(alpha=0.001, max_iter=10_000),
     "elasticnet": ElasticNet(alpha=0.001, l1_ratio=0.5, max_iter=10_000),
 }
 
@@ -70,8 +70,8 @@ class TrainResult:
     train_metrics: pd.DataFrame
     test_metrics: pd.DataFrame
     direction_metrics: pd.DataFrame
-    predictions: pd.DataFrame          # Index-aligned test predictions
-    coefficients: pd.DataFrame         # Feature importances / coefficients
+    predictions: pd.DataFrame  # Index-aligned test predictions
+    coefficients: pd.DataFrame  # Feature importances / coefficients
 
 
 # ===========================================================================
@@ -113,9 +113,7 @@ class ReturnRegressor:
                 f"Choose from: {list(_MODEL_REGISTRY.keys())}."
             )
         if not (0 < test_size < 1):
-            raise ValueError(
-                f"test_size must be in (0, 1), got {test_size}."
-            )
+            raise ValueError(f"test_size must be in (0, 1), got {test_size}.")
 
         self.model_name = model_name
         self.test_size = test_size
@@ -182,15 +180,17 @@ class ReturnRegressor:
 
         # Build sklearn Pipeline: scaler → regressor
         estimator = _clone_estimator(self.model_name)
-        pipeline = Pipeline([
-            ("scaler", StandardScaler()),
-            ("regressor", estimator),
-        ])
+        pipeline = Pipeline(
+            [
+                ("scaler", StandardScaler()),
+                ("regressor", estimator),
+            ]
+        )
         pipeline.fit(X_train, y_train)
 
         # Predictions
         y_train_pred = pipeline.predict(X_train)
-        y_test_pred  = pipeline.predict(X_test)
+        y_test_pred = pipeline.predict(X_test)
 
         # Metrics
         train_metrics = compute_regression_metrics(
@@ -206,12 +206,12 @@ class ReturnRegressor:
         # Test predictions DataFrame (index-aligned)
         predictions = pd.DataFrame(
             {
-                "date":           idx_test,
-                "ticker":         self.ticker,
-                "y_true":         y_test,
-                "y_pred":         y_test_pred,
-                "residual":       y_test - y_test_pred,
-                "model":          self.model_name,
+                "date": idx_test,
+                "ticker": self.ticker,
+                "y_true": y_test,
+                "y_pred": y_test_pred,
+                "residual": y_test - y_test_pred,
+                "model": self.model_name,
             }
         ).reset_index(drop=True)
 
@@ -226,7 +226,7 @@ class ReturnRegressor:
             extra={
                 "model": self.model_name,
                 "ticker": self.ticker,
-                "test_r2":   float(test_metrics["r2"].iloc[0]),
+                "test_r2": float(test_metrics["r2"].iloc[0]),
                 "test_rmse": float(test_metrics["rmse"].iloc[0]),
             },
         )
@@ -266,9 +266,7 @@ class ReturnRegressor:
             Called before :meth:`fit`.
         """
         if self._pipeline is None:
-            raise RuntimeError(
-                "Model has not been fitted yet. Call fit() first."
-            )
+            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
 
         missing = [f for f in self._feature_names if f not in feature_df.columns]
         if missing:
@@ -281,16 +279,16 @@ class ReturnRegressor:
 
         result = pd.DataFrame(
             {
-                "date":   feature_df.index,
+                "date": feature_df.index,
                 "ticker": self.ticker,
                 "y_pred": y_pred,
-                "model":  self.model_name,
+                "model": self.model_name,
             }
         )
 
         if _TARGET_COL in feature_df.columns:
             y_true = feature_df[_TARGET_COL].values.astype(float)
-            result["y_true"]   = y_true
+            result["y_true"] = y_true
             result["residual"] = y_true - y_pred
 
         return result.reset_index(drop=True)
@@ -346,21 +344,23 @@ class ReturnRegressor:
             X_train, X_test = X[train_idx], X[test_idx]
             y_train, y_test = y[train_idx], y[test_idx]
 
-            pipeline = Pipeline([
-                ("scaler", StandardScaler()),
-                ("regressor", _clone_estimator(self.model_name)),
-            ])
+            pipeline = Pipeline(
+                [
+                    ("scaler", StandardScaler()),
+                    ("regressor", _clone_estimator(self.model_name)),
+                ]
+            )
             pipeline.fit(X_train, y_train)
             y_pred = pipeline.predict(X_test)
 
             fold_metrics = compute_regression_metrics(
                 y_test, y_pred, label=f"fold_{fold_idx}"
             )
-            fold_metrics["fold"]       = fold_idx
-            fold_metrics["model"]      = self.model_name
-            fold_metrics["ticker"]     = self.ticker
+            fold_metrics["fold"] = fold_idx
+            fold_metrics["model"] = self.model_name
+            fold_metrics["ticker"] = self.ticker
             fold_metrics["train_rows"] = len(X_train)
-            fold_metrics["test_rows"]  = len(X_test)
+            fold_metrics["test_rows"] = len(X_test)
 
             fold_results.append(fold_metrics)
 
@@ -371,7 +371,7 @@ class ReturnRegressor:
             extra={
                 "model": self.model_name,
                 "ticker": self.ticker,
-                "mean_r2":   round(float(cv_df["r2"].mean()), 6),
+                "mean_r2": round(float(cv_df["r2"].mean()), 6),
                 "mean_rmse": round(float(cv_df["rmse"].mean()), 6),
             },
         )
@@ -407,7 +407,7 @@ class ReturnRegressor:
 
         for name in _MODEL_REGISTRY:
             regressor = ReturnRegressor(
-                model_name=name,        # type: ignore[arg-type]
+                model_name=name,  # type: ignore[arg-type]
                 test_size=self.test_size,
                 ticker=self.ticker,
             )
@@ -417,7 +417,7 @@ class ReturnRegressor:
             combined["directional_accuracy"] = float(
                 result.direction_metrics["directional_accuracy"].iloc[0]
             )
-            combined["model"]  = name
+            combined["model"] = name
             combined["ticker"] = self.ticker
             rows.append(combined)
 
@@ -470,7 +470,9 @@ class ReturnRegressor:
         """Return a DataFrame of scaled feature coefficients."""
         regressor = pipeline.named_steps["regressor"]
         if not hasattr(regressor, "coef_"):
-            return pd.DataFrame({"feature": feature_names, "coefficient": [None] * len(feature_names)})
+            return pd.DataFrame(
+                {"feature": feature_names, "coefficient": [None] * len(feature_names)}
+            )
 
         coef = regressor.coef_
         return (
@@ -489,6 +491,7 @@ class ReturnRegressor:
 def _clone_estimator(model_name: str) -> object:
     """Return a fresh (unfitted) clone of the requested estimator."""
     from sklearn.base import clone
+
     return clone(_MODEL_REGISTRY[model_name])
 
 

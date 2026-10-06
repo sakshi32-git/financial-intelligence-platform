@@ -27,7 +27,7 @@ body {
   border: 1px solid #cbd5e1 !important;
   border-radius: 14px !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 .dashboard-card .card-header {
@@ -38,11 +38,23 @@ body {
   font-size: 1.1rem !important;
   padding: 14px 20px !important;
   letter-spacing: -0.2px !important;
+  border-radius: 14px 14px 0 0 !important;
 }
 
 .dashboard-card .card-body {
   background-color: #ffffff !important;
   padding: 20px !important;
+  border-radius: 0 0 14px 14px !important;
+}
+
+/* ── Plotly Chart Containers — white background so labels are visible ─ */
+.js-plotly-plot,
+.js-plotly-plot .plotly,
+.js-plotly-plot .plot-container,
+.js-plotly-plot .svg-container,
+.dash-graph {
+  background-color: #ffffff !important;
+  border-radius: 0 0 14px 14px !important;
 }
 
 /* ── Dropdown High-Contrast Styling (Apple, Tickers, Indicators) ── */

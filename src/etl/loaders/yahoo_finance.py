@@ -139,22 +139,26 @@ class YahooFinanceLoader:
         rows = self._df_to_records(df)
         for batch in self._batches(rows):
             try:
-                dialect_name = self._session.bind.dialect.name if self._session.bind else "postgresql"
+                dialect_name = (
+                    self._session.bind.dialect.name
+                    if self._session.bind
+                    else "postgresql"
+                )
                 if dialect_name == "sqlite":
                     stmt = sqlite_insert(Company).values(batch)
                     stmt = stmt.on_conflict_do_update(
                         index_elements=["ticker", "exchange"],
                         set_={
-                            "name":               stmt.excluded.name,
-                            "sector":             stmt.excluded.sector,
-                            "industry":           stmt.excluded.industry,
-                            "country":            stmt.excluded.country,
-                            "currency":           stmt.excluded.currency,
-                            "market_cap":         stmt.excluded.market_cap,
+                            "name": stmt.excluded.name,
+                            "sector": stmt.excluded.sector,
+                            "industry": stmt.excluded.industry,
+                            "country": stmt.excluded.country,
+                            "currency": stmt.excluded.currency,
+                            "market_cap": stmt.excluded.market_cap,
                             "shares_outstanding": stmt.excluded.shares_outstanding,
-                            "isin":               stmt.excluded.isin,
-                            "cusip":              stmt.excluded.cusip,
-                            "updated_at":         datetime.now(timezone.utc),
+                            "isin": stmt.excluded.isin,
+                            "cusip": stmt.excluded.cusip,
+                            "updated_at": datetime.now(timezone.utc),
                         },
                     )
                 else:
@@ -162,16 +166,16 @@ class YahooFinanceLoader:
                     stmt = stmt.on_conflict_do_update(
                         constraint="uq_company_ticker_exchange",
                         set_={
-                            "name":               stmt.excluded.name,
-                            "sector":             stmt.excluded.sector,
-                            "industry":           stmt.excluded.industry,
-                            "country":            stmt.excluded.country,
-                            "currency":           stmt.excluded.currency,
-                            "market_cap":         stmt.excluded.market_cap,
+                            "name": stmt.excluded.name,
+                            "sector": stmt.excluded.sector,
+                            "industry": stmt.excluded.industry,
+                            "country": stmt.excluded.country,
+                            "currency": stmt.excluded.currency,
+                            "market_cap": stmt.excluded.market_cap,
                             "shares_outstanding": stmt.excluded.shares_outstanding,
-                            "isin":               stmt.excluded.isin,
-                            "cusip":              stmt.excluded.cusip,
-                            "updated_at":         datetime.now(timezone.utc),
+                            "isin": stmt.excluded.isin,
+                            "cusip": stmt.excluded.cusip,
+                            "updated_at": datetime.now(timezone.utc),
                         },
                     )
                 res = self._session.execute(stmt)
@@ -187,7 +191,11 @@ class YahooFinanceLoader:
 
         log.info(
             "Company load complete",
-            extra={"ticker": ticker, "inserted": result.inserted, "errors": len(result.errors)},
+            extra={
+                "ticker": ticker,
+                "inserted": result.inserted,
+                "errors": len(result.errors),
+            },
         )
         return result
 
@@ -257,19 +265,23 @@ class YahooFinanceLoader:
                 enriched.append(r)
 
             try:
-                dialect_name = self._session.bind.dialect.name if self._session.bind else "postgresql"
+                dialect_name = (
+                    self._session.bind.dialect.name
+                    if self._session.bind
+                    else "postgresql"
+                )
                 if dialect_name == "sqlite":
                     stmt = sqlite_insert(StockPrice).values(enriched)
                     stmt = stmt.on_conflict_do_update(
                         index_elements=["company_id", "price_date"],
                         set_={
-                            "open_price":   stmt.excluded.open_price,
-                            "high_price":   stmt.excluded.high_price,
-                            "low_price":    stmt.excluded.low_price,
-                            "close_price":  stmt.excluded.close_price,
-                            "volume":       stmt.excluded.volume,
-                            "data_source":  stmt.excluded.data_source,
-                            "updated_at":   datetime.now(timezone.utc),
+                            "open_price": stmt.excluded.open_price,
+                            "high_price": stmt.excluded.high_price,
+                            "low_price": stmt.excluded.low_price,
+                            "close_price": stmt.excluded.close_price,
+                            "volume": stmt.excluded.volume,
+                            "data_source": stmt.excluded.data_source,
+                            "updated_at": datetime.now(timezone.utc),
                         },
                     )
                 else:
@@ -277,13 +289,13 @@ class YahooFinanceLoader:
                     stmt = stmt.on_conflict_do_update(
                         constraint="uq_stockprice_company_date",
                         set_={
-                            "open_price":   stmt.excluded.open_price,
-                            "high_price":   stmt.excluded.high_price,
-                            "low_price":    stmt.excluded.low_price,
-                            "close_price":  stmt.excluded.close_price,
-                            "volume":       stmt.excluded.volume,
-                            "data_source":  stmt.excluded.data_source,
-                            "updated_at":   datetime.now(timezone.utc),
+                            "open_price": stmt.excluded.open_price,
+                            "high_price": stmt.excluded.high_price,
+                            "low_price": stmt.excluded.low_price,
+                            "close_price": stmt.excluded.close_price,
+                            "volume": stmt.excluded.volume,
+                            "data_source": stmt.excluded.data_source,
+                            "updated_at": datetime.now(timezone.utc),
                         },
                     )
                 res = self._session.execute(stmt)
@@ -368,6 +380,6 @@ class YahooFinanceLoader:
     ) -> list[list[dict[str, Any]]]:
         """Split a list of records into batches of size ``_batch_size``."""
         return [
-            records[i: i + self._batch_size]
+            records[i : i + self._batch_size]
             for i in range(0, len(records), self._batch_size)
         ]

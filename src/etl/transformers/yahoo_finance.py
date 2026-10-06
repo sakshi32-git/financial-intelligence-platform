@@ -31,27 +31,27 @@ log = logging.getLogger(__name__)
 
 # Yahoo Finance OHLCV column names → StockPrice ORM field names
 _PRICE_COLUMN_MAP: dict[str, str] = {
-    "Open":         "open_price",
-    "High":         "high_price",
-    "Low":          "low_price",
-    "Close":        "close_price",
-    "Volume":       "volume",
-    "Dividends":    "dividends",
+    "Open": "open_price",
+    "High": "high_price",
+    "Low": "low_price",
+    "Close": "close_price",
+    "Volume": "volume",
+    "Dividends": "dividends",
     "Stock Splits": "stock_splits",
 }
 
 # Yahoo Finance info keys → Company ORM field names
 _INFO_COLUMN_MAP: dict[str, str] = {
-    "longName":             "name",
-    "exchange":             "exchange",
-    "currency":             "currency",
-    "sector":               "sector",
-    "industry":             "industry",
-    "country":              "country",
-    "marketCap":            "market_cap",
-    "sharesOutstanding":    "shares_outstanding",
-    "isin":                 "isin",
-    "cusip":                "cusip",
+    "longName": "name",
+    "exchange": "exchange",
+    "currency": "currency",
+    "sector": "sector",
+    "industry": "industry",
+    "country": "country",
+    "marketCap": "market_cap",
+    "sharesOutstanding": "shares_outstanding",
+    "isin": "isin",
+    "cusip": "cusip",
 }
 
 # Required price columns — rows missing any are dropped.
@@ -61,21 +61,21 @@ _REQUIRED_PRICE_COLS: frozenset[str] = frozenset(
 
 # Exchange normalisation: Yahoo suffix → canonical exchange name
 _EXCHANGE_SUFFIX_MAP: dict[str, str] = {
-    "NMS":  "NASDAQ",
-    "NGM":  "NASDAQ",
-    "NCM":  "NASDAQ",
-    "NYQ":  "NYSE",
-    "ASE":  "AMEX",
-    "LSE":  "LSE",
-    "TSX":  "TSX",
-    "AMS":  "AMS",
-    "FRA":  "XETRA",
-    "TYO":  "TSE",
-    "HKG":  "HKEX",
-    "SHH":  "SSE",
-    "SHZ":  "SZSE",
-    "BSE":  "BSE",
-    "NSE":  "NSE",
+    "NMS": "NASDAQ",
+    "NGM": "NASDAQ",
+    "NCM": "NASDAQ",
+    "NYQ": "NYSE",
+    "ASE": "AMEX",
+    "LSE": "LSE",
+    "TSX": "TSX",
+    "AMS": "AMS",
+    "FRA": "XETRA",
+    "TYO": "TSE",
+    "HKG": "HKEX",
+    "SHH": "SSE",
+    "SHZ": "SZSE",
+    "BSE": "BSE",
+    "NSE": "NSE",
 }
 
 
@@ -159,9 +159,13 @@ class YahooFinanceTransformer:
 
         # 3. Cast numeric columns
         numeric_cols = [
-            "open_price", "high_price", "low_price",
-            "close_price", "volume",
-            "dividends", "stock_splits",
+            "open_price",
+            "high_price",
+            "low_price",
+            "close_price",
+            "volume",
+            "dividends",
+            "stock_splits",
         ]
         for col in numeric_cols:
             if col in df.columns:
@@ -191,9 +195,9 @@ class YahooFinanceTransformer:
         # 6. Enforce high >= low (provider sometimes inverts on ex-div days)
         mask = df["high_price"] < df["low_price"]
         if mask.any():
-            df.loc[mask, ["high_price", "low_price"]] = (
-                df.loc[mask, ["low_price", "high_price"]].values
-            )
+            df.loc[mask, ["high_price", "low_price"]] = df.loc[
+                mask, ["low_price", "high_price"]
+            ].values
             log.warning(
                 "Swapped inverted high/low",
                 extra={"ticker": ticker, "count": int(mask.sum())},
@@ -263,7 +267,9 @@ class YahooFinanceTransformer:
             ``shares_outstanding``, ``isin``, ``cusip``.
         """
         if raw_df.empty:
-            log.warning("Empty company info DataFrame received", extra={"ticker": ticker})
+            log.warning(
+                "Empty company info DataFrame received", extra={"ticker": ticker}
+            )
             return pd.DataFrame()
 
         log.info("Transforming company info", extra={"ticker": ticker})
@@ -272,9 +278,7 @@ class YahooFinanceTransformer:
 
         # 1. Select known columns only, rename to ORM names
         rename_map = {
-            src: dst
-            for src, dst in _INFO_COLUMN_MAP.items()
-            if src in df.columns
+            src: dst for src, dst in _INFO_COLUMN_MAP.items() if src in df.columns
         }
         df = df.rename(columns=rename_map)
 

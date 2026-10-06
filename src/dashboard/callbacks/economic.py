@@ -24,6 +24,7 @@ def _load_fred(series_id: str) -> pd.DataFrame:
     """Fetch from FRED API; fall back to demo data on any error."""
     try:
         from src.api.fred.client import FREDClient
+
         start = (pd.Timestamp.now() - pd.DateOffset(years=10)).strftime("%Y-%m-%d")
         client = FREDClient()
         df = client.get_series(series_id, start=start)
@@ -75,8 +76,10 @@ def register_economic_callbacks(app: Dash) -> None:
             yoy_chg = 0.0
             if not yoy_df.empty:
                 yoy_val = float(yoy_df.iloc[-1]["value"])
-                yoy_chg = (latest_val - yoy_val) if is_rate else (
-                    (latest_val - yoy_val) / yoy_val * 100 if yoy_val else 0.0
+                yoy_chg = (
+                    (latest_val - yoy_val)
+                    if is_rate
+                    else ((latest_val - yoy_val) / yoy_val * 100 if yoy_val else 0.0)
                 )
 
             # 3-Year trend
@@ -85,55 +88,69 @@ def register_economic_callbacks(app: Dash) -> None:
             trend_chg = 0.0
             if not trend_df.empty:
                 trend_val = float(trend_df.iloc[-1]["value"])
-                trend_chg = (latest_val - trend_val) if is_rate else (
-                    (latest_val - trend_val) / trend_val * 100 if trend_val else 0.0
+                trend_chg = (
+                    (latest_val - trend_val)
+                    if is_rate
+                    else (
+                        (latest_val - trend_val) / trend_val * 100 if trend_val else 0.0
+                    )
                 )
 
             kpi_latest = kpi_card(
                 f"Latest ({latest_date.strftime('%Y-%m')})",
-                f"{latest_val:,.2f}{suffix}", icon="bi-tag-fill"
+                f"{latest_val:,.2f}{suffix}",
+                icon="bi-tag-fill",
             )
             kpi_change = kpi_card(
-                "Period Change", f"{period_chg:+.2f}{suffix}",
-                delta=period_chg, icon="bi-graph-up"
+                "Period Change",
+                f"{period_chg:+.2f}{suffix}",
+                delta=period_chg,
+                icon="bi-graph-up",
             )
             kpi_yoy = kpi_card(
                 "Year-over-Year",
                 f"{yoy_chg:+.2f}{'%' if not is_rate else suffix}",
-                delta=yoy_chg, icon="bi-calendar-check"
+                delta=yoy_chg,
+                icon="bi-calendar-check",
             )
             kpi_trend = kpi_card(
                 "3-Year Trend",
                 f"{trend_chg:+.2f}{'%' if not is_rate else suffix}",
-                delta=trend_chg, icon="bi-arrow-trend-up"
+                delta=trend_chg,
+                icon="bi-arrow-trend-up",
             )
 
             fig = go.Figure()
-            fig.add_trace(go.Scatter(
-                x=df["date"], y=df["value"],
-                mode="lines", name=series_id,
-                line=dict(color="#059669", width=2.5),
-                fill="tozeroy", fillcolor="rgba(5,150,105,0.08)"
-            ))
+            fig.add_trace(
+                go.Scatter(
+                    x=df["date"],
+                    y=df["value"],
+                    mode="lines",
+                    name=series_id,
+                    line=dict(color="#059669", width=2.5),
+                    fill="tozeroy",
+                    fillcolor="rgba(5,150,105,0.08)",
+                )
+            )
             fig.update_layout(
                 template="plotly_white",
                 paper_bgcolor="#ffffff",
                 plot_bgcolor="#ffffff",
                 font=dict(family="Inter, sans-serif", color="#0f172a", size=12),
-                margin=dict(l=40, r=20, t=30, b=40),
+                margin=dict(l=60, r=20, t=30, b=40),
                 xaxis=dict(
                     showgrid=True,
                     gridcolor="#e2e8f0",
                     tickfont=dict(color="#0f172a", size=12),
                     title=dict(font=dict(color="#0f172a", size=13)),
-                    linecolor="#cbd5e1"
+                    linecolor="#cbd5e1",
                 ),
                 yaxis=dict(
                     showgrid=True,
                     gridcolor="#e2e8f0",
                     tickfont=dict(color="#0f172a", size=12),
                     title=dict(font=dict(color="#0f172a", size=13)),
-                    linecolor="#cbd5e1"
+                    linecolor="#cbd5e1",
                 ),
                 hovermode="x unified",
             )
@@ -145,6 +162,8 @@ def register_economic_callbacks(app: Dash) -> None:
             empty_fig = go.Figure().update_layout(
                 title=dict(text=str(exc), font=dict(color="#0f172a")),
                 template="plotly_white",
-                paper_bgcolor="#ffffff", plot_bgcolor="#ffffff"
+                paper_bgcolor="#ffffff",
+                plot_bgcolor="#ffffff",
+                margin=dict(l=60, r=20, t=30, b=40),
             )
             return empty_kpi, empty_kpi, empty_kpi, empty_kpi, empty_fig

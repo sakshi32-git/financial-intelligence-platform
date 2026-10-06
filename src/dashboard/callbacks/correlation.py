@@ -27,6 +27,7 @@ def _load_multi(tickers: list[str]) -> pd.DataFrame:
     if _DB_AVAILABLE:
         try:
             from src.analytics.loader import AnalyticsLoader
+
             start = (pd.Timestamp.now() - pd.DateOffset(years=1)).strftime("%Y-%m-%d")
             with AnalyticsLoader() as loader:
                 df = loader.load_prices_multi(tickers=tickers, start=start)
@@ -50,9 +51,14 @@ def register_correlation_callbacks(app: Dash) -> None:
         """Compute and render the Pearson correlation heatmap."""
         if not tickers or len(tickers) < 2:
             return go.Figure().update_layout(
-                title=dict(text="Select at least 2 assets.", font=dict(color="#0f172a", size=14)),
+                title=dict(
+                    text="Select at least 2 assets.",
+                    font=dict(color="#0f172a", size=14),
+                ),
                 template="plotly_white",
-                paper_bgcolor="#ffffff", plot_bgcolor="#ffffff"
+                paper_bgcolor="#ffffff",
+                plot_bgcolor="#ffffff",
+                margin=dict(l=60, r=40, t=40, b=60),
             )
         log.info("Updating correlation heatmap for: %s", tickers)
 
@@ -67,19 +73,28 @@ def register_correlation_callbacks(app: Dash) -> None:
             labels = corr.columns.tolist()
             z = corr.values
 
-            fig = go.Figure(data=go.Heatmap(
-                z=z, x=labels, y=labels,
-                colorscale="RdBu", zmin=-1, zmax=1,
-                text=corr.round(2).values,
-                texttemplate="%{text}",
-                textfont=dict(color="#0f172a", size=13, family="Inter, sans-serif"),
-                hoverinfo="x+y+z",
-                showscale=True,
-                colorbar=dict(
-                    title=dict(text="Pearson<br>Correlation", font=dict(color="#0f172a", size=13)),
-                    tickfont=dict(color="#0f172a", size=12)
-                ),
-            ))
+            fig = go.Figure(
+                data=go.Heatmap(
+                    z=z,
+                    x=labels,
+                    y=labels,
+                    colorscale="RdBu",
+                    zmin=-1,
+                    zmax=1,
+                    text=corr.round(2).values,
+                    texttemplate="%{text}",
+                    textfont=dict(color="#0f172a", size=13, family="Inter, sans-serif"),
+                    hoverinfo="x+y+z",
+                    showscale=True,
+                    colorbar=dict(
+                        title=dict(
+                            text="Pearson<br>Correlation",
+                            font=dict(color="#0f172a", size=13),
+                        ),
+                        tickfont=dict(color="#0f172a", size=12),
+                    ),
+                )
+            )
             fig.update_layout(
                 template="plotly_white",
                 paper_bgcolor="#ffffff",
@@ -90,13 +105,13 @@ def register_correlation_callbacks(app: Dash) -> None:
                     tickangle=-45,
                     showgrid=False,
                     tickfont=dict(color="#0f172a", size=13),
-                    title=dict(font=dict(color="#0f172a", size=13))
+                    title=dict(font=dict(color="#0f172a", size=13)),
                 ),
                 yaxis=dict(
                     autorange="reversed",
                     showgrid=False,
                     tickfont=dict(color="#0f172a", size=13),
-                    title=dict(font=dict(color="#0f172a", size=13))
+                    title=dict(font=dict(color="#0f172a", size=13)),
                 ),
                 hovermode="closest",
             )
@@ -107,5 +122,7 @@ def register_correlation_callbacks(app: Dash) -> None:
             return go.Figure().update_layout(
                 title=dict(text=str(exc), font=dict(color="#0f172a")),
                 template="plotly_white",
-                paper_bgcolor="#ffffff", plot_bgcolor="#ffffff"
+                paper_bgcolor="#ffffff",
+                plot_bgcolor="#ffffff",
+                margin=dict(l=60, r=40, t=40, b=60),
             )

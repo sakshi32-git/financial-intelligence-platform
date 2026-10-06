@@ -26,29 +26,29 @@ from dash import dcc, html
 
 PAGES: list[dict] = [
     {
-        "href":  "/",
+        "href": "/",
         "label": "Overview",
-        "icon":  "bi bi-grid-1x2-fill",
+        "icon": "bi bi-grid-1x2-fill",
     },
     {
-        "href":  "/stocks",
+        "href": "/stocks",
         "label": "Stocks",
-        "icon":  "bi bi-graph-up-arrow",
+        "icon": "bi bi-graph-up-arrow",
     },
     {
-        "href":  "/commodities",
+        "href": "/commodities",
         "label": "Commodities",
-        "icon":  "bi bi-fuel-pump-fill",
+        "icon": "bi bi-fuel-pump-fill",
     },
     {
-        "href":  "/economic",
+        "href": "/economic",
         "label": "Economic Indicators",
-        "icon":  "bi bi-bank2",
+        "icon": "bi bi-bank2",
     },
     {
-        "href":  "/correlation",
+        "href": "/correlation",
         "label": "Correlation",
-        "icon":  "bi bi-diagram-3-fill",
+        "icon": "bi bi-diagram-3-fill",
     },
 ]
 
@@ -104,7 +104,9 @@ def _footer() -> html.Div:
         className="sidebar-footer",
         children=[
             html.Span("v1.0.0", className="sidebar-footer-version"),
-            html.Span("Financial Intelligence Platform", className="sidebar-footer-name"),
+            html.Span(
+                "Financial Intelligence Platform", className="sidebar-footer-name"
+            ),
         ],
     )
 
@@ -121,7 +123,6 @@ def _eye_control_section() -> html.Div:
         children=[
             _divider("MOUSE MODE"),
             dcc.Interval(id="eye-status-interval", interval=1000),
-            
             # Mode Selector Radio
             dbc.RadioItems(
                 id="mouse-mode-radio",
@@ -133,7 +134,6 @@ def _eye_control_section() -> html.Div:
                 inline=False,
                 className="mb-2 text-light font-weight-bold",
             ),
-            
             # Status Badge
             html.Div(
                 className="mb-2",
@@ -142,19 +142,17 @@ def _eye_control_section() -> html.Div:
                     id="eye-mode-status-badge",
                     color="secondary",
                     className="p-2 w-100 text-truncate",
-                    style={"fontSize": "0.78rem"}
-                )
+                    style={"fontSize": "0.78rem"},
+                ),
             ),
-            
             # Status Alert
             dbc.Alert(
                 id="eye-mode-alert",
                 is_open=False,
                 dismissable=False,
                 className="p-2 mb-2 style-alert",
-                style={"fontSize": "0.75rem", "lineHeight": "1.2"}
+                style={"fontSize": "0.75rem", "lineHeight": "1.2"},
             ),
-
             # Calibration Collapsible Toggle Button
             dbc.Button(
                 "⚙️ Calibration & Sensitivity",
@@ -162,9 +160,8 @@ def _eye_control_section() -> html.Div:
                 size="sm",
                 color="outline-info",
                 className="w-100 mb-2 py-1",
-                style={"fontSize": "0.75rem"}
+                style={"fontSize": "0.75rem"},
             ),
-
             # Calibration Panel Collapse
             dbc.Collapse(
                 id="eye-calibration-collapse",
@@ -172,26 +169,41 @@ def _eye_control_section() -> html.Div:
                 children=dbc.Card(
                     className="p-2 bg-dark text-light border-secondary",
                     children=[
-                        html.Label("Cursor Smoothing", className="small mb-0 text-muted"),
+                        html.Label(
+                            "Cursor Smoothing", className="small mb-0 text-muted"
+                        ),
                         dcc.Slider(
                             id="eye-smoothing-slider",
-                            min=0.05, max=0.45, step=0.05, value=0.22,
+                            min=0.05,
+                            max=0.45,
+                            step=0.05,
+                            value=0.22,
                             marks={0.1: "Slow", 0.22: "Def", 0.4: "Fast"},
-                            className="mb-2"
+                            className="mb-2",
                         ),
-                        html.Label("Blink Sensitivity", className="small mb-0 text-muted"),
+                        html.Label(
+                            "Blink Sensitivity", className="small mb-0 text-muted"
+                        ),
                         dcc.Slider(
                             id="eye-blink-slider",
-                            min=0.12, max=0.28, step=0.02, value=0.20,
+                            min=0.12,
+                            max=0.28,
+                            step=0.02,
+                            value=0.20,
                             marks={0.15: "High", 0.20: "Def", 0.25: "Low"},
-                            className="mb-2"
+                            className="mb-2",
                         ),
-                        html.Label("Click Cooldown (s)", className="small mb-0 text-muted"),
+                        html.Label(
+                            "Click Cooldown (s)", className="small mb-0 text-muted"
+                        ),
                         dcc.Slider(
                             id="eye-cooldown-slider",
-                            min=0.4, max=1.6, step=0.2, value=0.8,
+                            min=0.4,
+                            max=1.6,
+                            step=0.2,
+                            value=0.8,
                             marks={0.4: "0.4s", 0.8: "0.8s", 1.4: "1.4s"},
-                            className="mb-1"
+                            className="mb-1",
                         ),
                         dbc.Alert(
                             "Settings applied live!",
@@ -199,12 +211,12 @@ def _eye_control_section() -> html.Div:
                             is_open=False,
                             duration=2000,
                             color="success",
-                            className="p-1 mt-1 text-center small mb-0"
-                        )
-                    ]
-                )
-            )
-        ]
+                            className="p-1 mt-1 text-center small mb-0",
+                        ),
+                    ],
+                ),
+            ),
+        ],
     )
 
 
@@ -227,12 +239,9 @@ def sidebar() -> html.Div:
         children=[
             # Hidden location tracker — required for active-link highlighting.
             dcc.Location(id="sidebar-location", refresh=False),
-
             # ── Branding ────────────────────────────────────────────────
             _logo_header(),
-
             html.Hr(className="sidebar-hr"),
-
             # ── Navigation ──────────────────────────────────────────────
             _divider("NAVIGATION"),
             dbc.Nav(
@@ -242,17 +251,12 @@ def sidebar() -> html.Div:
                 className="sidebar-nav",
                 children=[_nav_link(page) for page in PAGES],
             ),
-
             html.Hr(className="sidebar-hr"),
-
             # ── Mouse & Eye Control Mode ────────────────────────────────
             _eye_control_section(),
-
             # ── Spacer pushes footer to bottom ──────────────────────────
             html.Div(className="sidebar-spacer"),
-
             html.Hr(className="sidebar-hr"),
-
             # ── Footer ──────────────────────────────────────────────────
             _footer(),
         ],

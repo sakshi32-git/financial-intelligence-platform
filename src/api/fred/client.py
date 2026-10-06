@@ -77,13 +77,13 @@ _BASE_URL = "https://api.stlouisfed.org/fred"
 
 _VALID_FREQUENCIES: frozenset[str] = frozenset(
     {
-        "d",    # Daily
-        "w",    # Weekly
-        "bw",   # Biweekly
-        "m",    # Monthly
-        "q",    # Quarterly
-        "sa",   # Semiannual
-        "a",    # Annual
+        "d",  # Daily
+        "w",  # Weekly
+        "bw",  # Biweekly
+        "m",  # Monthly
+        "q",  # Quarterly
+        "sa",  # Semiannual
+        "a",  # Annual
     }
 )
 
@@ -91,15 +91,15 @@ _VALID_AGGREGATIONS: frozenset[str] = frozenset({"avg", "sum", "eop"})
 
 _VALID_UNITS: frozenset[str] = frozenset(
     {
-        "lin",   # Levels (no transformation)
-        "chg",   # Change
-        "ch1",   # Change from 1 year ago
-        "pch",   # Percent change
-        "pc1",   # Percent change from 1 year ago
-        "pca",   # Compounded annual rate of change
-        "cch",   # Continuously compounded rate of change
-        "cca",   # Continuously compounded annual rate of change
-        "log",   # Natural log
+        "lin",  # Levels (no transformation)
+        "chg",  # Change
+        "ch1",  # Change from 1 year ago
+        "pch",  # Percent change
+        "pc1",  # Percent change from 1 year ago
+        "pca",  # Compounded annual rate of change
+        "cch",  # Continuously compounded rate of change
+        "cca",  # Continuously compounded annual rate of change
+        "log",  # Natural log
     }
 )
 
@@ -166,9 +166,7 @@ class FREDClient:
                 f"request_timeout must be >= 1, got {request_timeout}."
             )
         if max_retries < 1:
-            raise FREDValidationError(
-                f"max_retries must be >= 1, got {max_retries}."
-            )
+            raise FREDValidationError(f"max_retries must be >= 1, got {max_retries}.")
 
         self._api_key = resolved_key
         self._timeout = request_timeout
@@ -392,9 +390,7 @@ class FREDClient:
         if not search_text or not search_text.strip():
             raise FREDValidationError("search_text must be a non-empty string.")
         if not (1 <= limit <= 1000):
-            raise FREDValidationError(
-                f"limit must be between 1 and 1000, got {limit}."
-            )
+            raise FREDValidationError(f"limit must be between 1 and 1000, got {limit}.")
         if sort_order not in _VALID_SORT_ORDERS:
             raise FREDValidationError(
                 f"sort_order={sort_order!r} is invalid. Choose 'asc' or 'desc'."
@@ -461,9 +457,7 @@ class FREDClient:
                 f"release_id must be a positive integer, got {release_id!r}."
             )
         if not (1 <= limit <= 1000):
-            raise FREDValidationError(
-                f"limit must be between 1 and 1000, got {limit}."
-            )
+            raise FREDValidationError(f"limit must be between 1 and 1000, got {limit}.")
 
         log.info(
             "Fetching FRED release series",
@@ -481,9 +475,7 @@ class FREDClient:
         series_list: list[dict] = data.get("seriess", [])
 
         if not series_list:
-            raise FREDNotFoundError(
-                f"No series found for release_id={release_id}."
-            )
+            raise FREDNotFoundError(f"No series found for release_id={release_id}.")
 
         df = pd.DataFrame(series_list)
         log.info(

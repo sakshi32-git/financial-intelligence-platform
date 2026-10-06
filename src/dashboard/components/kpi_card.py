@@ -3,7 +3,7 @@ kpi_card.py
 ===========
 Reusable Key Performance Indicator (KPI) card component.
 
-Displays a primary metric, its title, an optional icon, and an optional 
+Displays a primary metric, its title, an optional icon, and an optional
 delta/change value with conditional colouring (green for positive, red for negative).
 
 Exports
@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import Any
 import dash_bootstrap_components as dbc
 from dash import html
+
 
 def kpi_card(
     title: str,
@@ -34,12 +35,12 @@ def kpi_card(
     value : str | int | float
         The primary metric value to display.
     delta : float, optional
-        The change value. If provided, renders a colored badge (green if > 0, 
+        The change value. If provided, renders a colored badge (green if > 0,
         red if < 0, neutral if == 0).
     icon : str, optional
         A Bootstrap Icon class (e.g., "bi-graph-up").
     delta_prefix : str, optional
-        A string prepended to the delta (e.g., "+" or "-"). When None, computes 
+        A string prepended to the delta (e.g., "+" or "-"). When None, computes
         automatically for numbers.
 
     Returns
@@ -59,14 +60,14 @@ def kpi_card(
             elif delta_val < 0:
                 color_class = "kpi-delta-negative"
                 arrow = "bi-arrow-down-short"
-                sign = "" # Negative sign is included in the number
+                sign = ""  # Negative sign is included in the number
             else:
                 color_class = "kpi-delta-neutral"
                 arrow = "bi-dash"
                 sign = ""
-                
+
             display_delta = f"{delta_prefix}{sign}{delta_val:g}%"
-            
+
             delta_element = html.Div(
                 className=f"kpi-delta {color_class}",
                 children=[
@@ -98,14 +99,14 @@ def kpi_card(
                 children=[
                     html.Span(title, className="kpi-title"),
                     icon_element,
-                ]
+                ],
             ),
             html.Div(
                 className="kpi-body",
                 children=[
                     html.Span(str(value), className="kpi-value"),
                     delta_element,
-                ]
-            )
-        ]
+                ],
+            ),
+        ],
     )

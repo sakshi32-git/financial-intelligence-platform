@@ -12,6 +12,7 @@ from __future__ import annotations
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
+
 def correlation_layout() -> html.Div:
     """Return the layout for the Correlation Analysis page."""
     return html.Div(
@@ -23,7 +24,8 @@ def correlation_layout() -> html.Div:
                 children=[
                     dbc.Col(
                         html.H2("Asset Correlation", className="page-title m-0"),
-                        width=12, md=6,
+                        width=12,
+                        md=6,
                     ),
                     dbc.Col(
                         dcc.Dropdown(
@@ -42,12 +44,12 @@ def correlation_layout() -> html.Div:
                             clearable=False,
                             className="dash-bootstrap",
                         ),
-                        width=12, md=6,
+                        width=12,
+                        md=6,
                         className="text-end",
                     ),
                 ],
             ),
-
             # ── Description ────────────────────────────────────────────────
             dbc.Row(
                 className="mb-4",
@@ -58,13 +60,12 @@ def correlation_layout() -> html.Div:
                             "daily price returns of selected assets over the past year. "
                             "Values near 1.0 indicate strong positive correlation, while values "
                             "near -1.0 indicate strong negative correlation.",
-                            className="text-muted"
+                            className="text-muted",
                         ),
-                        width=12
+                        width=12,
                     )
-                ]
+                ],
             ),
-
             # ── Heatmap Chart ──────────────────────────────────────────────
             dbc.Row(
                 children=[
@@ -77,14 +78,14 @@ def correlation_layout() -> html.Div:
                                     dcc.Graph(
                                         id="correlation-heatmap",
                                         config={"displayModeBar": False},
-                                        style={"height": "600px"}
+                                        style={"height": "600px"},
                                     )
-                                )
-                            ]
+                                ),
+                            ],
                         ),
-                        width=12
+                        width=12,
                     )
                 ]
-            )
-        ]
+            ),
+        ],
     )

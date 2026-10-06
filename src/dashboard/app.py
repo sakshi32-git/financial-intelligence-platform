@@ -39,7 +39,13 @@ from dash import html
 from config import settings
 from logging_config import configure_logging
 from src.dashboard.components.sidebar import PAGES, sidebar
-from src.dashboard.layouts import stock_layout, commodity_layout, economic_layout, correlation_layout
+from src.dashboard.layouts import (
+    overview_layout,
+    stock_layout,
+    commodity_layout,
+    economic_layout,
+    correlation_layout,
+)
 from src.dashboard.callbacks import (
     register_stock_callbacks,
     register_commodity_callbacks,
@@ -67,8 +73,10 @@ app = dash.Dash(
     title="Financial Intelligence Platform",
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"},
-        {"name": "description",
-         "content": "Enterprise-grade financial analytics dashboard."},
+        {
+            "name": "description",
+            "content": "Enterprise-grade financial analytics dashboard.",
+        },
     ],
 )
 
@@ -107,6 +115,7 @@ app.layout = html.Div(
 # Router
 # ---------------------------------------------------------------------------
 
+
 @app.callback(
     dash.Output("page-content", "children"),
     dash.Input("sidebar-location", "pathname"),
@@ -122,21 +131,19 @@ def display_page(pathname: str):
     elif pathname == "/correlation":
         return correlation_layout()
     elif pathname == "/":
-        return html.Div(
-            className="text-center mt-5",
-            children=[
-                html.H2("Welcome to Financial Intelligence Platform"),
-                html.P("Select a module from the sidebar to get started.", className="text-muted"),
-            ]
-        )
+        return overview_layout()
     else:
         return html.Div(
             className="text-center mt-5",
             children=[
                 html.H2("404: Not Found", className="text-danger"),
-                html.P(f"The pathname {pathname} was not recognized.", className="text-muted"),
-            ]
+                html.P(
+                    f"The pathname {pathname} was not recognized.",
+                    className="text-muted",
+                ),
+            ],
         )
+
 
 # ---------------------------------------------------------------------------
 # Dev server
@@ -147,4 +154,7 @@ if __name__ == "__main__":
         host=settings.dashboard.host,
         port=settings.dashboard.port,
         debug=settings.app.env == "development",
+        # Disable the reloader — it forks the process, which crashes the
+        # eye-tracker thread's OpenCV webcam handles on Windows.
+        use_reloader=False,
     )

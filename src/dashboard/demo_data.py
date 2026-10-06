@@ -37,8 +37,15 @@ def generate_stock_prices(
     days: int = 504,  # ~2 years of trading days
 ) -> pd.DataFrame:
     """Return a synthetic stock OHLCV DataFrame for ``ticker``."""
-    _starts = {"AAPL": 150, "MSFT": 280, "NVDA": 400, "TSLA": 200,
-               "AMZN": 130, "GOOGL": 120, "META": 300}
+    _starts = {
+        "AAPL": 150,
+        "MSFT": 280,
+        "NVDA": 400,
+        "TSLA": 200,
+        "AMZN": 130,
+        "GOOGL": 120,
+        "META": 300,
+    }
     start_price = _starts.get(ticker.upper(), 100.0)
 
     end_date = pd.Timestamp.now().normalize()
@@ -51,16 +58,18 @@ def generate_stock_prices(
     open_ = close * noise
     volume = _RNG.integers(20_000_000, 80_000_000, days).astype(float)
 
-    return pd.DataFrame({
-        "ticker": ticker.upper(),
-        "price_date": dates,
-        "open_price": open_.round(2),
-        "high_price": high.round(2),
-        "low_price": low.round(2),
-        "close_price": close.round(2),
-        "volume": volume,
-        "adj_close": close.round(2),
-    })
+    return pd.DataFrame(
+        {
+            "ticker": ticker.upper(),
+            "price_date": dates,
+            "open_price": open_.round(2),
+            "high_price": high.round(2),
+            "low_price": low.round(2),
+            "close_price": close.round(2),
+            "volume": volume,
+            "adj_close": close.round(2),
+        }
+    )
 
 
 def generate_commodity_prices(
@@ -80,15 +89,17 @@ def generate_commodity_prices(
     open_ = close * _RNG.uniform(0.99, 1.01, days)
     volume = _RNG.integers(100_000, 500_000, days).astype(float)
 
-    return pd.DataFrame({
-        "ticker": symbol.upper(),
-        "price_date": dates,
-        "open_price": open_.round(2),
-        "high_price": high.round(2),
-        "low_price": low.round(2),
-        "close_price": close.round(2),
-        "volume": volume,
-    })
+    return pd.DataFrame(
+        {
+            "ticker": symbol.upper(),
+            "price_date": dates,
+            "open_price": open_.round(2),
+            "high_price": high.round(2),
+            "low_price": low.round(2),
+            "close_price": close.round(2),
+            "volume": volume,
+        }
+    )
 
 
 def generate_stock_prices_multi(
@@ -103,12 +114,14 @@ def generate_stock_prices_multi(
 def generate_economic_series(series_id: str) -> pd.DataFrame:
     """Return a synthetic economic time series for ``series_id``."""
     _configs = {
-        "GDP":      {"start": 20_000, "mu": 0.006,  "sigma": 0.008, "freq": "QS"},
-        "UNRATE":   {"start": 4.5,    "mu": 0.0,    "sigma": 0.05,  "freq": "MS"},
-        "CPIAUCSL": {"start": 280.0,  "mu": 0.003,  "sigma": 0.003, "freq": "MS"},
-        "FEDFUNDS": {"start": 5.25,   "mu": -0.001, "sigma": 0.02,  "freq": "MS"},
+        "GDP": {"start": 20_000, "mu": 0.006, "sigma": 0.008, "freq": "QS"},
+        "UNRATE": {"start": 4.5, "mu": 0.0, "sigma": 0.05, "freq": "MS"},
+        "CPIAUCSL": {"start": 280.0, "mu": 0.003, "sigma": 0.003, "freq": "MS"},
+        "FEDFUNDS": {"start": 5.25, "mu": -0.001, "sigma": 0.02, "freq": "MS"},
     }
-    cfg = _configs.get(series_id, {"start": 100.0, "mu": 0.002, "sigma": 0.01, "freq": "MS"})
+    cfg = _configs.get(
+        series_id, {"start": 100.0, "mu": 0.002, "sigma": 0.01, "freq": "MS"}
+    )
 
     end_date = pd.Timestamp.now().normalize()
     dates = pd.date_range(end=end_date, periods=120, freq=cfg["freq"])
@@ -116,8 +129,10 @@ def generate_economic_series(series_id: str) -> pd.DataFrame:
 
     values = _gbm_prices(cfg["start"], n, mu=cfg["mu"], sigma=cfg["sigma"])
 
-    return pd.DataFrame({
-        "date": dates,
-        "value": values.round(2),
-        "series_id": series_id,
-    })
+    return pd.DataFrame(
+        {
+            "date": dates,
+            "value": values.round(2),
+            "series_id": series_id,
+        }
+    )

@@ -13,6 +13,7 @@ from dash import dcc, html
 
 from src.dashboard.components.kpi_card import kpi_card
 
+
 def commodity_layout() -> html.Div:
     """Return the layout for the Commodity Analysis page."""
     return html.Div(
@@ -24,7 +25,8 @@ def commodity_layout() -> html.Div:
                 children=[
                     dbc.Col(
                         html.H2("Commodity Analysis", className="page-title m-0"),
-                        width=12, md=6,
+                        width=12,
+                        md=6,
                     ),
                     dbc.Col(
                         dcc.Dropdown(
@@ -32,6 +34,7 @@ def commodity_layout() -> html.Div:
                             options=[
                                 {"label": "Crude Oil (CL)", "value": "CL"},
                                 {"label": "Gold (GC)", "value": "GC"},
+                                {"label": "Silver (SI)", "value": "SI"},
                                 {"label": "Natural Gas (NG)", "value": "NG"},
                                 {"label": "Wheat (ZW)", "value": "ZW"},
                             ],
@@ -39,24 +42,47 @@ def commodity_layout() -> html.Div:
                             clearable=False,
                             className="dash-bootstrap",
                         ),
-                        width=12, md=6,
+                        width=12,
+                        md=6,
                         className="text-end",
                     ),
                 ],
             ),
-
             # ── KPI Cards ──────────────────────────────────────────────────
             dbc.Row(
                 id="commodity-kpi-row",
                 className="mb-4 g-3",
                 children=[
-                    dbc.Col(kpi_card("Latest Close", "-", icon="bi-tag-fill"), width=12, sm=6, lg=3, id="commodity-kpi-close"),
-                    dbc.Col(kpi_card("Daily Return", "-", icon="bi-graph-up"), width=12, sm=6, lg=3, id="commodity-kpi-return"),
-                    dbc.Col(kpi_card("30d Volatility", "-", icon="bi-activity"), width=12, sm=6, lg=3, id="commodity-kpi-volatility"),
-                    dbc.Col(kpi_card("30d Trend (SMA)", "-", icon="bi-arrow-trend-up"), width=12, sm=6, lg=3, id="commodity-kpi-sma"),
-                ]
+                    dbc.Col(
+                        kpi_card("Latest Close", "-", icon="bi-tag-fill"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="commodity-kpi-close",
+                    ),
+                    dbc.Col(
+                        kpi_card("Daily Return", "-", icon="bi-graph-up"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="commodity-kpi-return",
+                    ),
+                    dbc.Col(
+                        kpi_card("30d Volatility", "-", icon="bi-activity"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="commodity-kpi-volatility",
+                    ),
+                    dbc.Col(
+                        kpi_card("30d Trend (SMA)", "-", icon="bi-arrow-trend-up"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="commodity-kpi-sma",
+                    ),
+                ],
             ),
-
             # ── Charts ─────────────────────────────────────────────────────
             dbc.Row(
                 children=[
@@ -69,14 +95,14 @@ def commodity_layout() -> html.Div:
                                     dcc.Graph(
                                         id="commodity-price-chart",
                                         config={"displayModeBar": False},
-                                        style={"height": "400px"}
+                                        style={"height": "400px"},
                                     )
-                                )
-                            ]
+                                ),
+                            ],
                         ),
-                        width=12
+                        width=12,
                     )
                 ]
-            )
-        ]
+            ),
+        ],
     )

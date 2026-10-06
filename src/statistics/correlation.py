@@ -82,16 +82,12 @@ def pivot_returns(
         },
     )
 
-    wide = (
-        returns_long
-        .pivot_table(
-            index=date_col,
-            columns=ticker_col,
-            values=return_col,
-            aggfunc="last",
-        )
-        .sort_index()
-    )
+    wide = returns_long.pivot_table(
+        index=date_col,
+        columns=ticker_col,
+        values=return_col,
+        aggfunc="last",
+    ).sort_index()
     wide.index = pd.to_datetime(wide.index)
     wide.columns.name = None  # Remove "ticker" label from column axis.
 
@@ -200,7 +196,7 @@ def compute_pairwise_correlation(
     rows: list[dict] = []
 
     for i, a in enumerate(tickers):
-        for b in tickers[i + 1:]:
+        for b in tickers[i + 1 :]:
             s_a = returns_wide[a]
             s_b = returns_wide[b]
 
@@ -290,9 +286,7 @@ def compute_rolling_correlation(
                 f"Available: {list(returns_wide.columns)}"
             )
     if ticker_a == ticker_b:
-        raise ValueError(
-            "ticker_a and ticker_b must be different tickers."
-        )
+        raise ValueError("ticker_a and ticker_b must be different tickers.")
     if not isinstance(window, int) or window <= 1:
         raise ValueError(f"window must be an integer > 1, got {window!r}.")
 
@@ -344,8 +338,7 @@ def _require_cols(df: pd.DataFrame, cols: list[str]) -> None:
     missing = [c for c in cols if c not in df.columns]
     if missing:
         raise ValueError(
-            f"Required columns missing: {missing}. "
-            f"Available: {list(df.columns)}"
+            f"Required columns missing: {missing}. " f"Available: {list(df.columns)}"
         )
 
 

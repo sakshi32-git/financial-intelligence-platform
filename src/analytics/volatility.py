@@ -82,15 +82,17 @@ def compute_volatility(
         raise ValueError("windows must contain at least one value.")
     for w in windows:
         if not isinstance(w, int) or w <= 1:
-            raise ValueError(
-                f"All window sizes must be integers > 1, got {w!r}."
-            )
+            raise ValueError(f"All window sizes must be integers > 1, got {w!r}.")
     if trading_days <= 0:
         raise ValueError(f"trading_days must be > 0, got {trading_days}.")
 
     log.info(
         "Computing historical volatility",
-        extra={"return_col": return_col, "windows": windows, "trading_days": trading_days},
+        extra={
+            "return_col": return_col,
+            "windows": windows,
+            "trading_days": trading_days,
+        },
     )
 
     result = df.copy()
@@ -109,8 +111,11 @@ def compute_volatility(
             extra={
                 "window": w,
                 "non_null": int(result[col].notna().sum()),
-                "mean_annualised": round(float(result[col].mean()), 6)
-                if result[col].notna().any() else None,
+                "mean_annualised": (
+                    round(float(result[col].mean()), 6)
+                    if result[col].notna().any()
+                    else None
+                ),
             },
         )
 
@@ -177,17 +182,14 @@ def compute_parkinson_volatility(
     for col in (high_col, low_col):
         if col not in df.columns:
             raise ValueError(
-                f"{col!r} not found in DataFrame. "
-                f"Available: {list(df.columns)}"
+                f"{col!r} not found in DataFrame. " f"Available: {list(df.columns)}"
             )
     windows = list(windows)
     if not windows:
         raise ValueError("windows must contain at least one value.")
     for w in windows:
         if not isinstance(w, int) or w <= 1:
-            raise ValueError(
-                f"All window sizes must be integers > 1, got {w!r}."
-            )
+            raise ValueError(f"All window sizes must be integers > 1, got {w!r}.")
 
     log.info(
         "Computing Parkinson volatility",
@@ -201,7 +203,7 @@ def compute_parkinson_volatility(
     _4ln2 = 4.0 * math.log(2)
 
     # Point-in-time daily Parkinson estimate.
-    log_hl_sq = (np.log(high / low) ** 2)
+    log_hl_sq = np.log(high / low) ** 2
     result["pk_daily"] = np.sqrt(log_hl_sq / _4ln2)
 
     annualise = math.sqrt(trading_days)

@@ -14,6 +14,7 @@ from dash import dcc, html
 
 from src.dashboard.components.kpi_card import kpi_card
 
+
 def stock_layout() -> html.Div:
     """Return the layout for the Stock Analysis page."""
     return html.Div(
@@ -25,7 +26,8 @@ def stock_layout() -> html.Div:
                 children=[
                     dbc.Col(
                         html.H2("Stock Analysis", className="page-title m-0"),
-                        width=12, md=6,
+                        width=12,
+                        md=6,
                     ),
                     dbc.Col(
                         dcc.Dropdown(
@@ -33,31 +35,63 @@ def stock_layout() -> html.Div:
                             options=[
                                 {"label": "Apple (AAPL)", "value": "AAPL"},
                                 {"label": "Microsoft (MSFT)", "value": "MSFT"},
-                                {"label": "Nvidia (NVDA)", "value": "NVDA"},
+                                {
+                                    "label": "Alphabet / Google (GOOGL)",
+                                    "value": "GOOGL",
+                                },
+                                {"label": "Amazon (AMZN)", "value": "AMZN"},
                                 {"label": "Tesla (TSLA)", "value": "TSLA"},
+                                {"label": "Meta Platforms (META)", "value": "META"},
+                                {"label": "NVIDIA (NVDA)", "value": "NVDA"},
+                                {"label": "JPMorgan Chase (JPM)", "value": "JPM"},
+                                {"label": "Visa (V)", "value": "V"},
+                                {"label": "Johnson & Johnson (JNJ)", "value": "JNJ"},
                             ],
                             value="AAPL",
                             clearable=False,
                             className="dash-bootstrap",
                         ),
-                        width=12, md=6,
+                        width=12,
+                        md=6,
                         className="text-end",
                     ),
                 ],
             ),
-
             # ── KPI Cards ──────────────────────────────────────────────────
             dbc.Row(
                 id="stock-kpi-row",
                 className="mb-4 g-3",
                 children=[
-                    dbc.Col(kpi_card("Latest Close", "-", icon="bi-tag-fill"), width=12, sm=6, lg=3, id="stock-kpi-close"),
-                    dbc.Col(kpi_card("Daily Return", "-", icon="bi-graph-up"), width=12, sm=6, lg=3, id="stock-kpi-return"),
-                    dbc.Col(kpi_card("30d Volatility", "-", icon="bi-activity"), width=12, sm=6, lg=3, id="stock-kpi-volatility"),
-                    dbc.Col(kpi_card("30d Trend (SMA)", "-", icon="bi-arrow-trend-up"), width=12, sm=6, lg=3, id="stock-kpi-sma"),
-                ]
+                    dbc.Col(
+                        kpi_card("Latest Close", "-", icon="bi-tag-fill"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="stock-kpi-close",
+                    ),
+                    dbc.Col(
+                        kpi_card("Daily Return", "-", icon="bi-graph-up"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="stock-kpi-return",
+                    ),
+                    dbc.Col(
+                        kpi_card("30d Volatility", "-", icon="bi-activity"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="stock-kpi-volatility",
+                    ),
+                    dbc.Col(
+                        kpi_card("30d Trend (SMA)", "-", icon="bi-arrow-trend-up"),
+                        width=12,
+                        sm=6,
+                        lg=3,
+                        id="stock-kpi-sma",
+                    ),
+                ],
             ),
-
             # ── Charts ─────────────────────────────────────────────────────
             dbc.Row(
                 children=[
@@ -70,14 +104,14 @@ def stock_layout() -> html.Div:
                                     dcc.Graph(
                                         id="stock-price-chart",
                                         config={"displayModeBar": False},
-                                        style={"height": "400px"}
+                                        style={"height": "400px"},
                                     )
-                                )
-                            ]
+                                ),
+                            ],
                         ),
-                        width=12
+                        width=12,
                     )
                 ]
-            )
-        ]
+            ),
+        ],
     )

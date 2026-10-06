@@ -87,9 +87,9 @@ def compute_rolling_average(
     for w in windows:
         mp = min_periods if min_periods is not None else w
         col_name = f"sma_{w}"
-        result[col_name] = (
-            prices.rolling(window=w, min_periods=mp, center=center).mean()
-        )
+        result[col_name] = prices.rolling(
+            window=w, min_periods=mp, center=center
+        ).mean()
         log.debug(
             "SMA computed",
             extra={
