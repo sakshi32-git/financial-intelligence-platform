@@ -44,8 +44,8 @@ jobs:
 
       - name: Run Tests
         run: |
-          # Run pytest if test folder exists, otherwise pass
-          if [ -d "tests" ]; then pytest tests/; else echo "No tests found."; fi
+          # Run pytest if test folder exists, otherwise pass. Exit code 5 means no tests collected.
+          if [ -d "tests" ]; then pytest tests/ || [ $? -eq 5 ]; else echo "No tests found."; fi
 
   build:
     name: Build Docker Image
